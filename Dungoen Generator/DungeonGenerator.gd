@@ -5,7 +5,9 @@ class_name DungeonGenerator
 @export_group("Settings")
 @export var world_size: Vector2i = Vector2i(6, 6) # Larger grid for better pathing
 @export var number_of_rooms: int = 20
-@export var room_pixel_size: Vector2 = Vector2(256, 256)
+var tiles: int = 16
+var tile_size:int = 16
+@export var room_pixel_size: Vector2 = Vector2(tiles * tile_size, tiles * tile_size)
 
 @export_group("References")
 @onready var map_root: Node2D = %Map
@@ -75,7 +77,7 @@ func generate_dungeon() -> void:
 	# 3. Analyze Doors
 	_analyze_connections() 
 	
-	# 4. Assign Types (The New Logic)
+	# 4. Assign Types 
 	_assign_room_types_and_gameplay() 
 	
 	# 5. Draw
@@ -184,7 +186,7 @@ func _assign_room_types_and_gameplay() -> void:
 		var dist = distances.get(pos, 0)
 		var new_type = RoomType.ENEMY
 		
-		# Logic: Dist < 4 is "Early Game", Dist > 4 is "Late Game"
+		# Logic: Dist < 4 is EarlyBags, Dist > 4 is LateBags
 		if dist <= 4:
 			if early_bag.size() > 0: new_type = early_bag.pop_front()
 		else:
@@ -214,6 +216,9 @@ func _instantiate_scenes() -> void:
 				instance.modulate = TYPE_COLORS[type]
 				
 			map_root.add_child(instance)
+			if instance.has_method("setup_room"):
+				instance.setup_room(room_data["type"])
+			
 
 # --- UTILITIES ---
 

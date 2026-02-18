@@ -1,6 +1,7 @@
-[gd_scene load_steps=10 format=3 uid="uid://d3yu13uqb8jdf"]
+[gd_scene load_steps=11 format=3 uid="uid://d3yu13uqb8jdf"]
 
 [ext_resource type="Texture2D" uid="uid://clhh0mflib013" path="res://Assets/FirstPurpleTileset.png" id="1_hpgom"]
+[ext_resource type="Script" path="res://Room.gd" id="1_xxp1o"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_l6e76"]
 texture = ExtResource("1_hpgom")
@@ -516,6 +517,7 @@ texture = ExtResource("1_hpgom")
 sources/0 = SubResource("TileSetAtlasSource_gvuph")
 
 [node name="MasterRoom" type="Node2D"]
+script = ExtResource("1_xxp1o")
 
 [node name="Walls" type="TileMap" parent="."]
 z_index = 1
@@ -524,7 +526,7 @@ format = 2
 layer_0/tile_data = PackedInt32Array(-196614, 458752, 0, -131078, 458752, 1, -65542, 458752, 2, -6, 458752, 1, 65530, 458752, 0, 131066, 458752, 0, 196602, 458752, 1, 262138, 458752, 0, 327674, 458752, 1, 393210, 458752, 2, -262150, 458752, 1, -262149, 524288, 0, -262147, 589824, 0, -262148, 589824, 0, -262146, 720896, 2, -262145, 655360, 2, -327680, 524288, 0, -327679, 720896, 2, -327678, 655360, 2, -327677, 589824, 0, -327676, 524288, 0, -327675, 655360, 0, -262139, 655360, 1, -196603, 786432, 2, -131067, 786432, 3, -65531, 786432, 3, 5, 655360, 1, 65541, 786432, 3, 131077, 786432, 2, 196613, 655360, 1, 262149, 786432, 3, 327685, 786432, 4)
 
 [node name="shadows" type="TileMap" parent="."]
-z_index = 2
+z_index = 3
 tile_set = SubResource("TileSet_i1usr")
 format = 2
 layer_0/tile_data = PackedInt32Array(-196613, 131072, 11, -262140, 262144, 11, -262141, 196608, 11, -262142, 196608, 11, -262143, 196608, 11, -262144, 196608, 11, -196609, 196608, 11, -196610, 196608, 11, -196611, 196608, 11, -196612, 196608, 11, -131077, 131072, 12, -65541, 131072, 12, -5, 131072, 12, 65531, 131072, 12, 131067, 131072, 12, 196603, 131072, 12, 262139, 131072, 12, 327675, 131072, 12, 393211, 131072, 12, -196604, 262144, 12, -131068, 262144, 12, -65532, 262144, 12, 4, 262144, 12, 65540, 262144, 12, 131076, 262144, 12, 196612, 262144, 12, 262148, 262144, 12, 327684, 262144, 12)
@@ -547,3 +549,17 @@ offset_top = -133.0
 offset_right = 156.0
 offset_bottom = 160.0
 color = Color(0, 0, 0, 1)
+
+[node name="EnemySpawns" type="Node2D" parent="."]
+
+[node name="Marker2D4" type="Marker2D" parent="EnemySpawns"]
+position = Vector2(20, 10)
+
+[node name="Marker2D3" type="Marker2D" parent="EnemySpawns"]
+position = Vector2(-22, 9)
+
+[node name="Marker2D2" type="Marker2D" parent="EnemySpawns"]
+position = Vector2(18, -20)
+
+[node name="Marker2D" type="Marker2D" parent="EnemySpawns"]
+position = Vector2(-24, -31)
