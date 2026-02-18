@@ -1,0 +1,40 @@
+[gd_scene load_steps=17 format=3 uid="uid://cyih1bb0vhp8f"]
+
+[ext_resource type="Script" path="res://Room.gd" id="1_lanb8"]
+[ext_resource type="Texture2D" uid="uid://d1ysxvt4clqpt" path="res://Assets/BasicU.png" id="2_dde7e"]
+[ext_resource type="Texture2D" uid="uid://c8hrbpxtlcacw" path="res://Assets/BasicD.png" id="3_lghr0"]
+[ext_resource type="Texture2D" uid="uid://hellgjjttkwv" path="res://Assets/BasicR.png" id="4_dykjd"]
+[ext_resource type="Texture2D" uid="uid://cecj3n26n8kln" path="res://Assets/BasicL.png" id="5_6ls63"]
+[ext_resource type="Texture2D" uid="uid://b4lyn2347wus6" path="res://Assets/BasicUD.png" id="6_q2u4u"]
+[ext_resource type="Texture2D" uid="uid://dd5hfyc0eki8y" path="res://Assets/BasicLR.png" id="7_2gla6"]
+[ext_resource type="Texture2D" uid="uid://bjdglfnnq6li1" path="res://Assets/BasicUR.png" id="8_3kcro"]
+[ext_resource type="Texture2D" uid="uid://xw6dvrikgdki" path="res://Assets/BasicUL.png" id="9_jqauv"]
+[ext_resource type="Texture2D" uid="uid://ca25pg3hn5l86" path="res://Assets/BasicDR.png" id="10_pou18"]
+[ext_resource type="Texture2D" uid="uid://xne6m1m5qjh1" path="res://Assets/BasicDL.png" id="11_wxl80"]
+[ext_resource type="Texture2D" uid="uid://kwueobutkykd" path="res://Assets/BasicUDL.png" id="12_37o6e"]
+[ext_resource type="Texture2D" uid="uid://iyk4ff0ywcip" path="res://Assets/BasicULR.png" id="13_myvoi"]
+[ext_resource type="Texture2D" uid="uid://cv32nlj1hqd30" path="res://Assets/BasicUDR.png" id="14_0my4a"]
+[ext_resource type="Texture2D" uid="uid://cwoudq2dp8fuy" path="res://Assets/BasicDLR.png" id="15_45lrq"]
+[ext_resource type="Texture2D" uid="uid://dd8q6k3bmfn6y" path="res://Assets/BasicUDLR.png" id="16_2weom"]
+
+[node name="Room" type="Node2D"]
+script = ExtResource("1_lanb8")
+spU = ExtResource("2_dde7e")
+spD = ExtResource("3_lghr0")
+spR = ExtResource("4_dykjd")
+spL = ExtResource("5_6ls63")
+spUD = ExtResource("6_q2u4u")
+spRL = ExtResource("7_2gla6")
+spUR = ExtResource("8_3kcro")
+spUL = ExtResource("9_jqauv")
+spDR = ExtResource("10_pou18")
+spDL = ExtResource("11_wxl80")
+spULD = ExtResource("12_37o6e")
+spRUL = ExtResource("13_myvoi")
+spDRU = ExtResource("14_0my4a")
+spLDR = ExtResource("15_45lrq")
+spUDRL = ExtResource("16_2weom")
+enter_color = Color(1, 0.890196, 0, 1)
+boss_color = Color(0.878431, 0, 0, 1)
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
