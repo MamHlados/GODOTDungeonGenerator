@@ -563,3 +563,5 @@ position = Vector2(18, -20)
 
 [node name="Marker2D" type="Marker2D" parent="EnemySpawns"]
 position = Vector2(-24, -31)
+
+[node name="Chest" type="Marker2D" parent="."]

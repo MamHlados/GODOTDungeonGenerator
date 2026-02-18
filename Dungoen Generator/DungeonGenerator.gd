@@ -1,9 +1,9 @@
 extends Node2D
 class_name DungeonGenerator
 
-# --- CONFIGURATION ---
 @export_group("Settings")
-@export var world_size: Vector2i = Vector2i(6, 6) # Larger grid for better pathing
+#Grid
+@export var world_size: Vector2i = Vector2i(6, 6) 
 @export var number_of_rooms: int = 20
 var tiles: int = 16
 var tile_size:int = 16
@@ -12,7 +12,6 @@ var tile_size:int = 16
 @export_group("References")
 @onready var map_root: Node2D = %Map
 
-# --- SCENES ---
 const ROOM_SCENES = {
 	1: preload("res://ScenesRooms/U.tscn"),
 	2: preload("res://ScenesRooms/D.tscn"),
@@ -31,8 +30,7 @@ const ROOM_SCENES = {
 	15: preload("res://ScenesRooms/DLRU.tscn")
 }
 
-# --- ROOM LOGIC (NEW) ---
-enum RoomType { NORMAL, START, BOSS, LOOT, SHOP, ENEMY, TRAP, BUFF, KEY, EMPTY }
+enum RoomType { NORMAL, START, BOSS, LOOT, SHOP, ENEMY, BUFF, KEY, EMPTY }
 
 const TYPE_COLORS = {
 	RoomType.NORMAL: Color.WHITE,
@@ -41,17 +39,14 @@ const TYPE_COLORS = {
 	RoomType.LOOT: Color.GOLD,
 	RoomType.SHOP: Color.BLUE,
 	RoomType.ENEMY: Color.PURPLE,
-	RoomType.TRAP: Color.ORANGE,
 	RoomType.BUFF: Color.CYAN,
 	RoomType.KEY: Color.MAGENTA,
 	RoomType.EMPTY: Color.DIM_GRAY
 }
 
-# --- STATE VARIABLES ---
 var rooms: Array = []        
 var taken_positions: Array[Vector2i] = [] 
 
-# --- MAIN LOOP ---
 
 func _ready() -> void:
 	# Cap number of rooms
@@ -83,7 +78,6 @@ func generate_dungeon() -> void:
 	# 5. Draw
 	_instantiate_scenes()
 
-# --- STEP 1 & 2: LAYOUT GENERATION ---
 
 func _initialize_grid() -> void:
 	rooms.clear()
@@ -143,7 +137,6 @@ func _is_pos_valid(pos: Vector2i) -> bool:
 		if pos + offset == Vector2i.ZERO: return false
 	return true
 
-# --- STEP 3: CONNECTIONS ---
 
 func _analyze_connections() -> void:
 	for pos in taken_positions:
@@ -153,7 +146,6 @@ func _analyze_connections() -> void:
 		room["door_left"] = _get_room_data(pos + Vector2i.LEFT) != null
 		room["door_right"] = _get_room_data(pos + Vector2i.RIGHT) != null
 
-# --- STEP 4: GAMEPLAY LOGIC (TYPES) ---
 
 func _assign_room_types_and_gameplay() -> void:
 	# 1. Calculate Flood Fill Distances
@@ -167,34 +159,53 @@ func _assign_room_types_and_gameplay() -> void:
 	var key_pos = _find_key_position(boss_pos, distances)
 	_get_room_data(key_pos)["type"] = RoomType.KEY
 	
-	# 4. Prepare Logic Bags
-	var early_bag = [RoomType.LOOT, RoomType.LOOT, RoomType.EMPTY, RoomType.EMPTY]
-	for i in range(5): early_bag.append(RoomType.ENEMY)
+	# 4. Available spots
+	var early_spots = []
+	var late_spots = []
 	
-	var late_bag = [RoomType.SHOP, RoomType.BUFF, RoomType.TRAP, RoomType.TRAP]
-	for i in range(8): late_bag.append(RoomType.ENEMY)
-	
-	early_bag.shuffle()
-	late_bag.shuffle()
-	
-	# 5. Assign Remaining Rooms
 	for pos in taken_positions:
 		var room = _get_room_data(pos)
-		# Skip if already assigned (Start, Boss, Key)
 		if room["type"] != RoomType.NORMAL: continue
 		
 		var dist = distances.get(pos, 0)
-		var new_type = RoomType.ENEMY
-		
-		# Logic: Dist < 4 is EarlyBags, Dist > 4 is LateBags
 		if dist <= 4:
-			if early_bag.size() > 0: new_type = early_bag.pop_front()
+			early_spots.append(pos)
 		else:
-			if late_bag.size() > 0: new_type = late_bag.pop_front()
-			
-		room["type"] = new_type
+			late_spots.append(pos)
+	
+	#Shuffle
+	early_spots.shuffle()
+	late_spots.shuffle()
+	
+	#Must spawns
+	var late_items = [RoomType.SHOP, RoomType.BUFF, RoomType.EMPTY, RoomType.LOOT]
+	var early_items = [RoomType.LOOT, RoomType.LOOT, RoomType.EMPTY, RoomType.EMPTY, RoomType.BUFF]
+	
+	#5. Assign late items
+	for item in late_items:
+		if late_spots.size() > 0:
+			var pos = late_spots.pop_front()
+			_get_room_data(pos)["type"] = item
+		#Map too small(fat so it wont spawn late items)
+		elif early_spots.size() > 0:
+			var pos = early_spots.pop_front()
+			_get_room_data(pos)["type"] = item
+		
+	#6. Assign early items
+	for item in early_items:
+		if early_spots.size() > 0:
+			var pos = early_spots.pop_front()
+			_get_room_data(pos)["type"] = item
+		elif late_spots.size() > 0:
+			var pos = late_spots.pop_front()
+			_get_room_data(pos)["type"] = item
+	
+	#7. Fill the rest with Enemies room
+	for pos in late_spots:
+		_get_room_data(pos)["type"] = RoomType.ENEMY
+	for pos in early_spots:
+		_get_room_data(pos)["type"] = RoomType.ENEMY
 
-# --- STEP 5: DRAWING ---
 
 func _instantiate_scenes() -> void:
 	for pos in taken_positions:
@@ -220,7 +231,6 @@ func _instantiate_scenes() -> void:
 				instance.setup_room(room_data["type"])
 			
 
-# --- UTILITIES ---
 
 func _calculate_distances_from_start() -> Dictionary:
 	var start_pos = Vector2i.ZERO
@@ -257,17 +267,28 @@ func _find_key_position(boss_pos: Vector2i, distances: Dictionary) -> Vector2i:
 	var best_pos = Vector2i.ZERO
 	var max_dist_from_boss = -1
 	
+	var fallback_pos = Vector2i.ZERO
+	var max_fallback_dist = -1
+	
 	for pos in taken_positions:
 		if pos == Vector2i.ZERO or pos == boss_pos: continue
-		if _count_neighbors(pos) == 1: # Dead End
-			# Distance logic: Keep away from Boss
-			var dist = abs(pos.x - boss_pos.x) + abs(pos.y - boss_pos.y)
-			if dist > max_dist_from_boss:
-				max_dist_from_boss = dist
-				best_pos = pos
-				
-	if best_pos == Vector2i.ZERO: best_pos = taken_positions.pick_random()
-	return best_pos
+		
+		var dist_to_boss = abs(pos.x - boss_pos.x) + abs(pos.y - boss_pos.y)
+		var dist_from_start = distances.get(pos, 0)
+		#Furtherest room from boss
+		if dist_to_boss > max_fallback_dist:
+			max_fallback_dist = dist_to_boss
+			fallback_pos = pos
+		#Furtherest room that is atleast 3 steps from start
+		if dist_from_start > 3 and dist_to_boss > max_dist_from_boss:
+			max_dist_from_boss = dist_to_boss
+			best_pos = pos
+	#Pick the right one
+	if best_pos != Vector2i.ZERO:
+		return best_pos
+	else:
+		return fallback_pos
+		
 
 func _get_room_data(pos: Vector2i):
 	var ax = pos.x + world_size.x
