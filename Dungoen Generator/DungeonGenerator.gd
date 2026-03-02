@@ -9,7 +9,6 @@ var tiles: int = 16
 var tile_size:int = 16
 @export var room_pixel_size: Vector2 = Vector2(tiles * tile_size, tiles * tile_size)
 
-@export_group("References")
 @onready var map_root: Node2D = %Map
 
 const ROOM_SCENES = {
@@ -47,7 +46,6 @@ const TYPE_COLORS = {
 var rooms: Array = []        
 var taken_positions: Array[Vector2i] = [] 
 
-
 func _ready() -> void:
 	# Cap number of rooms
 	var max_capacity = (world_size.x * 2) * (world_size.y * 2)
@@ -77,7 +75,6 @@ func generate_dungeon() -> void:
 	
 	# 5. Draw
 	_instantiate_scenes()
-
 
 func _initialize_grid() -> void:
 	rooms.clear()
@@ -137,7 +134,6 @@ func _is_pos_valid(pos: Vector2i) -> bool:
 		if pos + offset == Vector2i.ZERO: return false
 	return true
 
-
 func _analyze_connections() -> void:
 	for pos in taken_positions:
 		var room = _get_room_data(pos)
@@ -145,7 +141,6 @@ func _analyze_connections() -> void:
 		room["door_bot"] = _get_room_data(pos + Vector2i.DOWN) != null
 		room["door_left"] = _get_room_data(pos + Vector2i.LEFT) != null
 		room["door_right"] = _get_room_data(pos + Vector2i.RIGHT) != null
-
 
 func _assign_room_types_and_gameplay() -> void:
 	# 1. Calculate Flood Fill Distances
@@ -206,7 +201,6 @@ func _assign_room_types_and_gameplay() -> void:
 	for pos in early_spots:
 		_get_room_data(pos)["type"] = RoomType.ENEMY
 
-
 func _instantiate_scenes() -> void:
 	for pos in taken_positions:
 		var room_data = _get_room_data(pos)
@@ -221,7 +215,7 @@ func _instantiate_scenes() -> void:
 			var instance = ROOM_SCENES[mask].instantiate()
 			instance.position = Vector2(pos) * room_pixel_size
 			
-			# --- THE VISUAL DEBUGGER ---
+			# THE VISUAL DEBUGGER 
 			var type = room_data["type"]
 			if TYPE_COLORS.has(type):
 				instance.modulate = TYPE_COLORS[type]
@@ -229,8 +223,6 @@ func _instantiate_scenes() -> void:
 			map_root.add_child(instance)
 			if instance.has_method("setup_room"):
 				instance.setup_room(room_data["type"])
-			
-
 
 func _calculate_distances_from_start() -> Dictionary:
 	var start_pos = Vector2i.ZERO
@@ -288,7 +280,6 @@ func _find_key_position(boss_pos: Vector2i, distances: Dictionary) -> Vector2i:
 		return best_pos
 	else:
 		return fallback_pos
-		
 
 func _get_room_data(pos: Vector2i):
 	var ax = pos.x + world_size.x
