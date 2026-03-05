@@ -5,28 +5,28 @@ class_name DungeonGenerator
 #Grid
 @export var world_size: Vector2i = Vector2i(6, 6) 
 @export var number_of_rooms: int = 20
-var tiles: int = 16
+var tiles: int = 25
 var tile_size:int = 16
 @export var room_pixel_size: Vector2 = Vector2(tiles * tile_size, tiles * tile_size)
 
 @onready var map_root: Node2D = %Map
 
 const ROOM_SCENES = {
-	1: preload("res://ScenesRooms/U.tscn"),
-	2: preload("res://ScenesRooms/D.tscn"),
-	3: preload("res://ScenesRooms/DU.tscn"),
-	4: preload("res://ScenesRooms/R.tscn"),
-	5: preload("res://ScenesRooms/RU.tscn"),
-	6: preload("res://ScenesRooms/DR.tscn"),
-	7: preload("res://ScenesRooms/DRU.tscn"),
-	8: preload("res://ScenesRooms/L.tscn"),
-	9: preload("res://ScenesRooms/LU.tscn"),
-	10: preload("res://ScenesRooms/DL.tscn"),
-	11: preload("res://ScenesRooms/DLU.tscn"),
-	12: preload("res://ScenesRooms/LR.tscn"),
-	13: preload("res://ScenesRooms/LRU.tscn"),
-	14: preload("res://ScenesRooms/DLR.tscn"),
-	15: preload("res://ScenesRooms/DLRU.tscn")
+	1: preload("res://ScenesRooms/From_master_roomV2/V2U.tscn"),
+	2: preload("res://ScenesRooms/From_master_roomV2/V2D.tscn"),
+	3: preload("res://ScenesRooms/From_master_roomV2/V2DU.tscn"),
+	4: preload("res://ScenesRooms/From_master_roomV2/V2R.tscn"),
+	5: preload("res://ScenesRooms/From_master_roomV2/V2RU.tscn"),
+	6: preload("res://ScenesRooms/From_master_roomV2/V2DR.tscn"),
+	7: preload("res://ScenesRooms/From_master_roomV2/V2DRU.tscn"),
+	8: preload("res://ScenesRooms/From_master_roomV2/V2L.tscn"),
+	9: preload("res://ScenesRooms/From_master_roomV2/V2LU.tscn"),
+	10: preload("res://ScenesRooms/From_master_roomV2/V2DL.tscn"),
+	11: preload("res://ScenesRooms/From_master_roomV2/V2DLU.tscn"),
+	12: preload("res://ScenesRooms/From_master_roomV2/V2LR.tscn"),
+	13: preload("res://ScenesRooms/From_master_roomV2/V2LRU.tscn"),
+	14: preload("res://ScenesRooms/From_master_roomV2/V2DLR.tscn"),
+	15: preload("res://ScenesRooms/From_master_roomV2/V2DLRU.tscn")
 }
 
 enum RoomType { NORMAL, START, BOSS, LOOT, SHOP, ENEMY, BUFF, KEY, EMPTY }
