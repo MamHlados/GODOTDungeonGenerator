@@ -43,6 +43,13 @@ toggle_map={
 ]
 }
 
+[layer_names]
+
+2d_render/layer_1="Player"
+2d_render/layer_2="Environment"
+2d_render/layer_3="Enemies"
+2d_render/layer_4="EnemyBlockers"
+
 [rendering]
 
 textures/canvas_textures/default_texture_filter=0

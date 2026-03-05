@@ -5,7 +5,7 @@ class_name DungeonGenerator
 #Grid
 @export var world_size: Vector2i = Vector2i(6, 6) 
 @export var number_of_rooms: int = 20
-var tiles: int = 25
+var tiles: int = 34
 var tile_size:int = 16
 @export var room_pixel_size: Vector2 = Vector2(tiles * tile_size, tiles * tile_size)
 
@@ -215,14 +215,20 @@ func _instantiate_scenes() -> void:
 			var instance = ROOM_SCENES[mask].instantiate()
 			instance.position = Vector2(pos) * room_pixel_size
 			
+			room_data["instance"] = instance
+			
+			map_root.add_child(instance)
+			
+			instance.player_entered_door.connect(_on_player_transition)
+			
 			# THE VISUAL DEBUGGER 
 			var type = room_data["type"]
 			if TYPE_COLORS.has(type):
 				instance.modulate = TYPE_COLORS[type]
 				
-			map_root.add_child(instance)
+			
 			if instance.has_method("setup_room"):
-				instance.setup_room(room_data["type"])
+				instance.setup_room(room_data, pos)
 
 func _calculate_distances_from_start() -> Dictionary:
 	var start_pos = Vector2i.ZERO
@@ -295,3 +301,17 @@ func _count_neighbors(pos: Vector2i) -> int:
 	for offset in [Vector2i.UP, Vector2i.DOWN, Vector2i.LEFT, Vector2i.RIGHT]:
 		if _get_room_data(pos + offset) != null: count += 1
 	return count
+
+func _on_player_transition	(current_pos: Vector2i, direction: Vector2i, player: CharacterBody2D):
+	#Position of the next door
+	var next_room_pos = current_pos + direction
+	var neighbor_data = _get_room_data(next_room_pos)
+	
+	#Does the room exist?
+	if neighbor_data != null and neighbor_data.has("instance"):
+		var next_room_node = neighbor_data["instance"]
+		
+		var arrival_pos = next_room_node.get_arrival_marker(direction)
+		
+		player.global_position = arrival_pos 
+	

@@ -6,6 +6,8 @@
 
 [node name="FlyingEye" type="CharacterBody2D"]
 z_index = 2
+collision_layer = 4
+collision_mask = 11
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("1_sh020")
