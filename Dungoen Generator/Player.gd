@@ -5,7 +5,7 @@ extends CharacterBody2D
 var character_direction : Vector2
 
 var normal_zoom = Vector2(4,4)
-var whole_map_zoom = Vector2(0.3,0.3)
+var whole_map_zoom = Vector2(0.2,0.2)
 var map_view = false
 
 func _physics_process(delta):

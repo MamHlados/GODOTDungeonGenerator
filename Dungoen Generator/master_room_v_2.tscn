@@ -1309,10 +1309,10 @@ position = Vector2(-183, 1)
 position = Vector2(13, -5)
 shape = SubResource("RectangleShape2D_470xh")
 
-[node name="TopBlocker2" type="StaticBody2D" parent="EnemyBlocker"]
+[node name="TopBlocker" type="StaticBody2D" parent="EnemyBlocker"]
 position = Vector2(-1, -186)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="EnemyBlocker/TopBlocker2"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="EnemyBlocker/TopBlocker"]
 position = Vector2(-1.5, 16)
 shape = SubResource("RectangleShape2D_vtfp5")
 

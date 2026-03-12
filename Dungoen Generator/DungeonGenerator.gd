@@ -10,6 +10,7 @@ var tile_size:int = 16
 @export var room_pixel_size: Vector2 = Vector2(tiles * tile_size, tiles * tile_size)
 
 @onready var map_root: Node2D = %Map
+@onready var fade_screen = $TransitionLayer/ColorRect
 
 const ROOM_SCENES = {
 	1: preload("res://ScenesRooms/From_master_roomV2/V2U.tscn"),
@@ -313,5 +314,21 @@ func _on_player_transition	(current_pos: Vector2i, direction: Vector2i, player: 
 		
 		var arrival_pos = next_room_node.get_arrival_marker(direction)
 		
+		#player wont move when the screen is fading
+		player.set_physics_process(false)
+		
+		#transition fading
+		var tween_out = create_tween()
+		tween_out.tween_property(fade_screen, "modulate:a", 1.0, 1.5)
+		await tween_out.finished
+		
 		player.global_position = arrival_pos 
+		
+		#back to transparent screen
+		var tween_in = create_tween()
+		tween_in.tween_property(fade_screen, "modulate:a", 0.0, 0.3)
+		await tween_in.finished
+		
+		#player can move now
+		player.set_physics_process(true)
 	

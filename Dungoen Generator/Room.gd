@@ -20,14 +20,22 @@ func setup_room(room_data: Dictionary, map_pos: Vector2i):
 	grid_pos = map_pos
 	
 	#Turning of collisions without doors
-	if not room_data["door_top"] and has_node("DoorCollisions/TopDoor/CollisionShape2D"):
-		$DoorCollisions/TopDoor/CollisionShape2D.set_deferred("disabled", true)
-	if not room_data["door_bot"] and has_node("DoorCollisions/BotDoor/CollisionShape2D"):
-		$DoorCollisions/BotDoor/CollisionShape2D.set_deferred("disabled", true)
-	if not room_data["door_left"] and has_node("DoorCollisions/LeftDoor/CollisionShape2D"):
-		$DoorCollisions/LeftDoor/CollisionShape2D.set_deferred("disabled", true)
-	if not room_data["door_right"] and has_node("DoorCollisions/RightDoor/CollisionShape2D"):
-		$DoorCollisions/RightDoor/CollisionShape2D.set_deferred("disabled", true)
+	if not room_data["door_top"] :
+		if has_node ("EnemyBlocker/TopBlocker/CollisionShape2D") and has_node("DoorCollisions/TopDoor/CollisionShape2D"):
+			$DoorCollisions/TopDoor/CollisionShape2D.set_deferred("disabled", true)
+			$EnemyBlocker/TopBlocker/CollisionShape2D.set_deferred("disabled", true)
+	if not room_data["door_bot"]:
+		if has_node ("EnemyBlocker/BottomBlocker/CollisionShape2D") and has_node("DoorCollisions/BotDoor/CollisionShape2D"):
+			$DoorCollisions/BotDoor/CollisionShape2D.set_deferred("disabled", true)
+			$EnemyBlocker/BottomBlocker/CollisionShape2D.set_deferred("disabled", true)
+	if not room_data["door_left"]:
+		if has_node ("EnemyBlocker/LeftBlocker/CollisionShape2D") and has_node("DoorCollisions/LeftDoor/CollisionShape2D"):
+			$EnemyBlocker/LeftBlocker/CollisionShape2D.set_deferred("disabled", true)
+			$DoorCollisions/LeftDoor/CollisionShape2D.set_deferred("disabled", true)
+	if not room_data["door_right"]:
+		if has_node ("EnemyBlocker/RightBlocker/CollisionShape2D") and has_node("DoorCollisions/RightDoor/CollisionShape2D"):
+			$EnemyBlocker/RightBlocker/CollisionShape2D.set_deferred("disabled", true)
+			$DoorCollisions/RightDoor/CollisionShape2D.set_deferred("disabled", true)
 		
 	if room_data["type"] == DungeonGenerator.RoomType.ENEMY:
 		spawn_enemies()
