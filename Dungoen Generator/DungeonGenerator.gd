@@ -13,21 +13,25 @@ var tile_size:int = 16
 @onready var fade_screen = $TransitionLayer/ColorRect
 
 const ROOM_SCENES = {
-	1: preload("res://ScenesRooms/From_master_roomV2/V2U.tscn"),
-	2: preload("res://ScenesRooms/From_master_roomV2/V2D.tscn"),
-	3: preload("res://ScenesRooms/From_master_roomV2/V2DU.tscn"),
-	4: preload("res://ScenesRooms/From_master_roomV2/V2R.tscn"),
-	5: preload("res://ScenesRooms/From_master_roomV2/V2RU.tscn"),
-	6: preload("res://ScenesRooms/From_master_roomV2/V2DR.tscn"),
-	7: preload("res://ScenesRooms/From_master_roomV2/V2DRU.tscn"),
-	8: preload("res://ScenesRooms/From_master_roomV2/V2L.tscn"),
-	9: preload("res://ScenesRooms/From_master_roomV2/V2LU.tscn"),
-	10: preload("res://ScenesRooms/From_master_roomV2/V2DL.tscn"),
-	11: preload("res://ScenesRooms/From_master_roomV2/V2DLU.tscn"),
-	12: preload("res://ScenesRooms/From_master_roomV2/V2LR.tscn"),
-	13: preload("res://ScenesRooms/From_master_roomV2/V2LRU.tscn"),
-	14: preload("res://ScenesRooms/From_master_roomV2/V2DLR.tscn"),
-	15: preload("res://ScenesRooms/From_master_roomV2/V2DLRU.tscn")
+	1:[ preload("res://ScenesRooms/From_master_roomV2/V2U.tscn"),
+		preload("res://ScenesRooms/From_master_roomV3/V3U.tscn"),],
+	2:[ preload("res://ScenesRooms/From_master_roomV2/V2D.tscn"),
+		preload("res://ScenesRooms/From_master_roomV3/V3D.tscn"),],
+	3:[ preload("res://ScenesRooms/From_master_roomV2/V2DU.tscn"),],
+	4:[ preload("res://ScenesRooms/From_master_roomV2/V2R.tscn"),
+		preload("res://ScenesRooms/From_master_roomV3/V3R.tscn"),],
+	5:[ preload("res://ScenesRooms/From_master_roomV2/V2RU.tscn"),],
+	6:[ preload("res://ScenesRooms/From_master_roomV2/V2DR.tscn"),],
+	7:[ preload("res://ScenesRooms/From_master_roomV2/V2DRU.tscn"),],
+	8:[ preload("res://ScenesRooms/From_master_roomV2/V2L.tscn"),
+		preload("res://ScenesRooms/From_master_roomV3/V3L.tscn"),],
+	9:[ preload("res://ScenesRooms/From_master_roomV2/V2LU.tscn"),],
+	10:[ preload("res://ScenesRooms/From_master_roomV2/V2DL.tscn"),],
+	11:[ preload("res://ScenesRooms/From_master_roomV2/V2DLU.tscn"),],
+	12:[ preload("res://ScenesRooms/From_master_roomV2/V2LR.tscn"),],
+	13:[ preload("res://ScenesRooms/From_master_roomV2/V2LRU.tscn"),],
+	14:[ preload("res://ScenesRooms/From_master_roomV2/V2DLR.tscn"),],
+	15:[ preload("res://ScenesRooms/From_master_roomV2/V2DLRU.tscn")]
 }
 
 enum RoomType { NORMAL, START, BOSS, LOOT, SHOP, ENEMY, BUFF, KEY, EMPTY }
@@ -213,7 +217,9 @@ func _instantiate_scenes() -> void:
 		if room_data["door_left"]: mask += 8
 		
 		if ROOM_SCENES.has(mask):
-			var instance = ROOM_SCENES[mask].instantiate()
+			var room_variation = ROOM_SCENES[mask]
+			var chosen_scene = room_variation.pick_random()
+			var instance = chosen_scene.instantiate()
 			instance.position = Vector2(pos) * room_pixel_size
 			
 			room_data["instance"] = instance
