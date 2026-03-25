@@ -5,7 +5,7 @@ class_name DungeonGenerator
 #Grid
 @export var world_size: Vector2i = Vector2i(6, 6) 
 @export var number_of_rooms: int = 20
-var tiles: int = 34
+var tiles: int = 35
 var tile_size:int = 16
 @export var room_pixel_size: Vector2 = Vector2(tiles * tile_size, tiles * tile_size)
 
@@ -22,16 +22,21 @@ const ROOM_SCENES = {
 		preload("res://ScenesRooms/From_master_roomV3/V3R.tscn"),],
 	5:[ preload("res://ScenesRooms/From_master_roomV2/V2RU.tscn"),],
 	6:[ preload("res://ScenesRooms/From_master_roomV2/V2DR.tscn"),],
-	7:[ preload("res://ScenesRooms/From_master_roomV2/V2DRU.tscn"),],
+	7:[ preload("res://ScenesRooms/From_master_roomV2/V2DRU.tscn"),
+		preload("res://ScenesRooms/from_master_roomV4/V4DRU.tscn"),],
 	8:[ preload("res://ScenesRooms/From_master_roomV2/V2L.tscn"),
 		preload("res://ScenesRooms/From_master_roomV3/V3L.tscn"),],
 	9:[ preload("res://ScenesRooms/From_master_roomV2/V2LU.tscn"),],
 	10:[ preload("res://ScenesRooms/From_master_roomV2/V2DL.tscn"),],
-	11:[ preload("res://ScenesRooms/From_master_roomV2/V2DLU.tscn"),],
+	11:[ preload("res://ScenesRooms/From_master_roomV2/V2DLU.tscn"),
+		 preload("res://ScenesRooms/from_master_roomV4/V4DLR.tscn"),],
 	12:[ preload("res://ScenesRooms/From_master_roomV2/V2LR.tscn"),],
-	13:[ preload("res://ScenesRooms/From_master_roomV2/V2LRU.tscn"),],
-	14:[ preload("res://ScenesRooms/From_master_roomV2/V2DLR.tscn"),],
-	15:[ preload("res://ScenesRooms/From_master_roomV2/V2DLRU.tscn")]
+	13:[ preload("res://ScenesRooms/From_master_roomV2/V2LRU.tscn"),
+		 preload("res://ScenesRooms/from_master_roomV4/V4LRU.tscn"),],
+	14:[ preload("res://ScenesRooms/From_master_roomV2/V2DLR.tscn"),
+		 preload("res://ScenesRooms/from_master_roomV4/V4DLR.tscn"),],
+	15:[ preload("res://ScenesRooms/From_master_roomV2/V2DLRU.tscn"),
+		 preload("res://ScenesRooms/from_master_roomV4/V4DLRU.tscn"),]
 }
 
 enum RoomType { NORMAL, START, BOSS, LOOT, SHOP, ENEMY, BUFF, KEY, EMPTY }
@@ -231,7 +236,11 @@ func _instantiate_scenes() -> void:
 			# THE VISUAL DEBUGGER 
 			var type = room_data["type"]
 			if TYPE_COLORS.has(type):
-				instance.modulate = TYPE_COLORS[type]
+				var floor_node = instance.get_node_or_null("Floor+Walls") 
+				if floor_node != null:
+					floor_node.modulate = TYPE_COLORS[type]
+				else:
+					print("Could not find the floor node in ", instance.name)
 				
 			
 			if instance.has_method("setup_room"):
