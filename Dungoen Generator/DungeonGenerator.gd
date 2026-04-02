@@ -10,7 +10,7 @@ var tile_size:int = 16
 @export var room_pixel_size: Vector2 = Vector2(tiles * tile_size, tiles * tile_size)
 
 @onready var map_root: Node2D = %Map
-@onready var fade_screen = $TransitionLayer/ColorRect
+@onready var fade_screen = $ScreenTransition/ColorRect
 
 const ROOM_SCENES = {
 	1:[ preload("res://ScenesRooms/From_master_roomV2/V2U.tscn"),
