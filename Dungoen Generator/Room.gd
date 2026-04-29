@@ -6,6 +6,8 @@ extends Node2D
 const ENEMY_SCENE = preload("res://flying_eye.tscn")
 const CHEST_SCENE = preload("res://chest.tscn")
 
+enum RoomType { NORMAL, START, BOSS, LOOT, SHOP, ENEMY, BUFF, KEY, EMPTY }
+
 signal player_entered_door(current_room_pos: Vector2i, direction: Vector2i, player_node: CharacterBody2D)
 var grid_pos: Vector2i
 
@@ -37,10 +39,10 @@ func setup_room(room_data: Dictionary, map_pos: Vector2i):
 			$EnemyBlocker/RightBlocker/CollisionShape2D.set_deferred("disabled", true)
 			$DoorCollisions/RightDoor/CollisionShape2D.set_deferred("disabled", true)
 		
-	if room_data["type"] == DungeonGenerator.RoomType.ENEMY:
+	if room_data["type"] == RoomType.ENEMY:
 		spawn_enemies()
 		
-	if room_data["type"] == DungeonGenerator.RoomType.LOOT:
+	if room_data["type"] == RoomType.LOOT:
 		spawn_chest()
 		
 func _on_door_entered(body, direction: Vector2i):
