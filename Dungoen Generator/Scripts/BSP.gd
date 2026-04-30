@@ -6,21 +6,29 @@ class_name BSP
 @export var depth: int = 4 
 
 func _create_layout() -> void:
-	var bounds = int(ceil(sqrt(number_of_rooms * 0.6)))
+	var bounds = int(ceil(sqrt(number_of_rooms * 0.8)))
 	if bounds < 2: bounds = 2
 	
 	var dirs = [Vector2i.UP, Vector2i.DOWN, Vector2i.LEFT, Vector2i.RIGHT]
 	var spawn_dir = dirs.pick_random()
 	
 	var start_rect: Rect2i
+	
+	var max_x = world_size.x - 1
+	var max_y = world_size.y - 1
+	
+	var size_x = min(bounds * 2, max_x)
+	var size_y = min(bounds * 2, max_y)
+	
 	if spawn_dir == Vector2i.RIGHT:
-		start_rect == Rect2i(1, -bounds, bounds * 2, bounds * 2)
+		start_rect = Rect2i(1, -size_y / 2, size_x, size_y)
 	elif spawn_dir == Vector2i.LEFT:
-		start_rect = Rect2i(-1 - bounds * 2, -bounds, bounds * 2, bounds * 2)
+		start_rect = Rect2i(-size_x, -size_y / 2, size_x, size_y)
 	elif spawn_dir == Vector2i.DOWN:
-		start_rect = Rect2i(-bounds, 1, bounds * 2, bounds * 2)
+		start_rect = Rect2i(-size_x / 2, 1, size_x, size_y)
 	elif spawn_dir == Vector2i.UP:
-		start_rect = Rect2i(-bounds, -1 - bounds * 2, bounds * 2, bounds * 2)
+		start_rect = Rect2i(-size_x / 2, -size_y, size_x, size_y)
+		
 	
 	var partitions = _split_space(start_rect, depth)
 	var room_centers: Array[Vector2i] = []
@@ -28,33 +36,47 @@ func _create_layout() -> void:
 	_set_room_data(start_pos, {"grid_pos": start_pos, "type": RoomType.START})
 	taken_positions.append(start_pos)
 	
+	var forced_neighbor = start_pos + spawn_dir
+	_set_room_data(forced_neighbor, {"grid_pos": forced_neighbor, "type": RoomType.NORMAL})
+	taken_positions.append(forced_neighbor)
 	
-	var new_pos = start_pos + dirs.pick_random()
-	_set_room_data(new_pos,{"grid_pos": new_pos, "type": RoomType.NORMAL})
-	taken_positions.append(new_pos)
-	
-	room_centers.append(new_pos)
+	room_centers.append(forced_neighbor)
 	
 	for p in partitions:
 		var center = p.get_center()
 		if abs(center.x) < world_size.x and abs(center.y) < world_size.y:
-			if center != start_pos:
+			if center != start_pos and center != forced_neighbor:
 				room_centers.append(center)
 			
 	room_centers.sort_custom(func(a,b):
-		var dist_a = abs(a.x) + abs(a.y)
-		var dist_b = abs (b.x) + abs(b.y)
+		var dist_a = abs(a.x - forced_neighbor.x) + abs(a.y - forced_neighbor.y)
+		var dist_b = abs(b.x - forced_neighbor.x) + abs(b.y - forced_neighbor.y)
 		return dist_a < dist_b
-		)
-
+	)
+	
 	for i in range(room_centers.size() - 1):
 		if taken_positions.size() >= number_of_rooms:
-			print("Max limit of rooms:", taken_positions.size())
 			break
-		
 		_create_corridor(room_centers[i], room_centers[i+1])
 		
-	
+	var fallback_loops = 0
+	while taken_positions.size() < number_of_rooms and fallback_loops < 2000:
+		fallback_loops += 1
+		
+		var random_existing_room = taken_positions.pick_random()
+		
+		if random_existing_room == Vector2i.ZERO: continue
+		var step_dir = dirs.pick_random()
+		var pad_pos = random_existing_room + step_dir
+		
+		var is_next_to_start = (abs(pad_pos.x) + abs(pad_pos.y) == 1)
+		if is_next_to_start and pad_pos != forced_neighbor: continue
+		
+		if pad_pos != Vector2i.ZERO and _get_room_data(pad_pos) == null:
+			if abs(pad_pos.x) < world_size.x and abs(pad_pos.y) < world_size.y:
+				_set_room_data(pad_pos, {"grid_pos": pad_pos, "type": RoomType.NORMAL})
+				taken_positions.append(pad_pos)
+				
 func _split_space(rect: Rect2i, current_depth: int) -> Array[Rect2i]:
 	if current_depth == 0: return [rect]
 	
@@ -72,7 +94,6 @@ func _split_space(rect: Rect2i, current_depth: int) -> Array[Rect2i]:
 	if split_horizontally:
 		rect1 = Rect2i(rect.position, Vector2i(rect.size.x, split_point))
 		rect2 = Rect2i(rect.position + Vector2i(0, split_point), Vector2i(rect.size.x, rect.size.y - split_point))
-		
 	else:
 		rect1 = Rect2i(rect.position, Vector2i(split_point, rect.size.y))
 		rect2 = Rect2i(rect.position + Vector2i(split_point, 0), Vector2i(rect.size.x - split_point, rect.size.y))
@@ -88,11 +109,18 @@ func _create_corridor(start: Vector2i, end: Vector2i) -> void:
 		if taken_positions.size() >= number_of_rooms:
 			return
 		
-		if current.x != end.x:
-			current.x += sign(end.x - current.x)
-		elif current.y != end.y:
-			current.y += sign(end.y - current.y)
-		
+		var next_step = current
+		if next_step.x != end.x:
+			next_step.x += sign(end.x - current.x)
+		elif next_step.y != end.y:
+			next_step.y += sign(end.y - current.y)
+			
+		if next_step == Vector2i.ZERO:
+			if current.y != end.y: current.y += sign(end.y - current.y)
+			else: current.x += sign(end.x - current.x)
+			continue 
+			
+		current = next_step
 		if _get_room_data(current) == null:
 			_set_room_data(current, {"grid_pos": current, "type": RoomType.NORMAL})
 			taken_positions.append(current)

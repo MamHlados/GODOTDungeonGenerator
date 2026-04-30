@@ -64,6 +64,9 @@ func get_arrival_marker(entry_direction: Vector2i) -> Vector2:
 	
 func spawn_enemies():
 	#Get locations
+	if spawn_points_enemy_container == null:
+		print("Error: In scene", self.name, " is no enemyspawner")
+		return
 	var available_points = spawn_points_enemy_container.get_children()
 	
 	available_points.shuffle()

@@ -1,7 +1,7 @@
 [gd_scene load_steps=20 format=3 uid="uid://bw2ku1i6dcn36"]
 
 [ext_resource type="Texture2D" uid="uid://clhh0mflib013" path="res://Assets/FirstPurpleTileset.png" id="1_4c076"]
-[ext_resource type="Script" path="res://Room.gd" id="1_4lufs"]
+[ext_resource type="Script" path="res://Scripts/Room.gd" id="1_vr073"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_pun3h"]
 texture = ExtResource("1_4c076")
@@ -1179,7 +1179,7 @@ size = Vector2(81, 20)
 size = Vector2(20, 88)
 
 [node name="Master_roomV2" type="Node2D"]
-script = ExtResource("1_4lufs")
+script = ExtResource("1_vr073")
 
 [node name="Tilemaps" type="Node2D" parent="."]
 

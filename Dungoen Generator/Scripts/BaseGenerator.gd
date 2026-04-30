@@ -60,12 +60,6 @@ func _ready() -> void:
 	var max_capacity = (world_size.x * 2) * (world_size.y * 2)
 	if number_of_rooms >= max_capacity:
 		number_of_rooms = int(max_capacity * 0.8)
-	
-	generate_dungeon()
-
-func _input(_event: InputEvent) -> void:
-	if Input.is_action_just_pressed("ui_accept"):
-		generate_dungeon()
 
 func generate_dungeon() -> void:
 	print("Generating Dungeon...")

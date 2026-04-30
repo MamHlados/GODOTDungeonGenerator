@@ -1,7 +1,7 @@
 [gd_scene load_steps=11 format=3 uid="uid://d3yu13uqb8jdf"]
 
 [ext_resource type="Texture2D" uid="uid://clhh0mflib013" path="res://Assets/FirstPurpleTileset.png" id="1_hpgom"]
-[ext_resource type="Script" path="res://Room.gd" id="1_xxp1o"]
+[ext_resource type="Script" path="res://Scripts/Room.gd" id="1_xxp1o"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_l6e76"]
 texture = ExtResource("1_hpgom")
