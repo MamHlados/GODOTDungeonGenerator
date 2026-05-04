@@ -1,13 +1,18 @@
-[gd_scene load_steps=3 format=3 uid="uid://cy2mdabc00cqb"]
+[gd_scene load_steps=5 format=3 uid="uid://cy2mdabc00cqb"]
 
 [ext_resource type="Texture2D" uid="uid://sbur5eb4q21u" path="res://Assets/FlyingEye/FlyingEyeEnemy.png" id="1_sh020"]
+[ext_resource type="Script" path="res://Scripts/flying_eye.gd" id="1_y42uu"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_uskf0"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_i1oji"]
+radius = 90.3549
 
 [node name="FlyingEye" type="CharacterBody2D"]
 z_index = 2
 collision_layer = 4
-collision_mask = 11
+collision_mask = 15
+script = ExtResource("1_y42uu")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("1_sh020")
@@ -15,3 +20,12 @@ texture = ExtResource("1_sh020")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, -1)
 shape = SubResource("CircleShape2D_uskf0")
+
+[node name="DetectionZone" type="Area2D" parent="."]
+collision_layer = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DetectionZone"]
+shape = SubResource("CircleShape2D_i1oji")
+
+[connection signal="body_entered" from="DetectionZone" to="." method="_on_detection_zone_body_entered"]
+[connection signal="body_exited" from="DetectionZone" to="." method="_on_detection_zone_body_exited"]

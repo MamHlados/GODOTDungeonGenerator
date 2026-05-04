@@ -122,3 +122,13 @@ func spawn_chest():
 		add_child(chest)
 	else:
 		print("Error: MISSING CHEST IN LOOT ROOM")
+		
+func activate_room(player: CharacterBody2D):
+	for child in get_children():
+		if child.has_method("wake_up"):
+			child.wake_up(player)
+			
+func deactivate_room():
+	for child in get_children():
+		if child.has_method("sleep"):
+			child.sleep()

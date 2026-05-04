@@ -301,5 +301,12 @@ func _on_player_transition	(current_pos: Vector2i, direction: Vector2i, player: 
 		
 		player.global_position = arrival_pos 
 		
+		var current_room_data = _get_room_data(current_pos)
+		if current_room_data != null and current_room_data.has("instance"):
+			if current_room_data["instance"].has_method("deactivate_room"):
+				current_room_data["instance"].deactivate_room()
+		if next_room_node.has_method("activate_room"):
+			next_room_node.activate_room(player)
+		
 	
 
