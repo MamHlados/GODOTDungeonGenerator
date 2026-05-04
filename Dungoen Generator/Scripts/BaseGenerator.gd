@@ -38,7 +38,9 @@ const ROOM_SCENES = {
 		 preload("res://ScenesRooms/from_master_roomV4/V4DLRU.tscn"),]
 }
 
-enum RoomType { NORMAL, START, BOSS, LOOT, SHOP, ENEMY, BUFF, KEY, EMPTY }
+enum RoomType { NORMAL, START, BOSS, LOOT, SHOP, ENEMY, BUFF, KEY, EMPTY, TRAP }
+
+var friendly_types = [RoomType.START, RoomType.LOOT, RoomType.SHOP, RoomType.EMPTY]
 
 const TYPE_COLORS = {
 	RoomType.NORMAL: Color.WHITE,
@@ -49,7 +51,8 @@ const TYPE_COLORS = {
 	RoomType.ENEMY: Color.PURPLE,
 	RoomType.BUFF: Color.CYAN,
 	RoomType.KEY: Color.MAGENTA,
-	RoomType.EMPTY: Color.DIM_GRAY
+	RoomType.EMPTY: Color.DIM_GRAY,
+	RoomType.TRAP: Color.ORANGE
 }
 
 var rooms: Array = []        
@@ -134,26 +137,26 @@ func _assign_room_types_and_gameplay() -> void:
 	late_spots.shuffle()
 	
 	#Must spawns
-	var late_items = [RoomType.SHOP, RoomType.BUFF, RoomType.EMPTY, RoomType.LOOT]
-	var early_items = [RoomType.LOOT, RoomType.LOOT, RoomType.EMPTY, RoomType.EMPTY, RoomType.BUFF]
+	var late_items = [RoomType.SHOP, RoomType.BUFF, RoomType.EMPTY, RoomType.TRAP]
+	var early_items = [RoomType.LOOT, RoomType.EMPTY, RoomType.BUFF, RoomType.TRAP, RoomType.TRAP, RoomType.LOOT]
 	
 	#5. Assign late items
 	for item in late_items:
 		if late_spots.size() > 0:
-			var pos = late_spots.pop_front()
+			var pos = _pop_safe_spot(late_spots)
 			_get_room_data(pos)["type"] = item
 		#Map too small(fat so it wont spawn late items)
 		elif early_spots.size() > 0:
-			var pos = early_spots.pop_front()
+			var pos = _pop_safe_spot(early_spots)
 			_get_room_data(pos)["type"] = item
 		
 	#6. Assign early items
 	for item in early_items:
 		if early_spots.size() > 0:
-			var pos = early_spots.pop_front()
+			var pos = _pop_safe_spot(early_spots)
 			_get_room_data(pos)["type"] = item
 		elif late_spots.size() > 0:
-			var pos = late_spots.pop_front()
+			var pos = _pop_safe_spot(late_spots)
 			_get_room_data(pos)["type"] = item
 	
 	#7. Fill the rest with Enemies room
@@ -269,6 +272,21 @@ func _count_neighbors(pos: Vector2i) -> int:
 		if _get_room_data(pos + offset) != null: count += 1
 	return count
 
+func _has_friendly_neighbor(pos: Vector2i) -> bool:
+	for offset in [Vector2i.UP, Vector2i.DOWN, Vector2i.LEFT, Vector2i.RIGHT]:
+		var neighbor_data = _get_room_data(pos + offset)
+		if neighbor_data != null:
+			if neighbor_data["type"] in friendly_types:
+				return true
+	return false
+	
+func _pop_safe_spot(spots_list: Array) -> Vector2i:
+	for i in range (spots_list.size()):
+		var pos = spots_list[i]
+		if not _has_friendly_neighbor(pos):
+			return spots_list.pop_at(i)
+	return spots_list.pop_front()
+	
 func _on_player_transition	(current_pos: Vector2i, direction: Vector2i, player: CharacterBody2D):
 	#Position of the next door
 	var next_room_pos = current_pos + direction
