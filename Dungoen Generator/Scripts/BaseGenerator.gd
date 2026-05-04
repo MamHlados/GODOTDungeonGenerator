@@ -124,6 +124,7 @@ func _assign_room_types_and_gameplay() -> void:
 	
 	for pos in taken_positions:
 		var room = _get_room_data(pos)
+		room ["distance"] = distances.get(pos,0)
 		if room["type"] != RoomType.NORMAL: continue
 		
 		var dist = distances.get(pos, 0)

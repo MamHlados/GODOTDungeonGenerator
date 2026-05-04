@@ -1215,6 +1215,15 @@ position = Vector2(-20, 12)
 [node name="Marker2D5" type="Marker2D" parent="EnemySpawns"]
 position = Vector2(12, 12)
 
+[node name="Marker2D6" type="Marker2D" parent="EnemySpawns"]
+position = Vector2(7, 21)
+
+[node name="Marker2D7" type="Marker2D" parent="EnemySpawns"]
+position = Vector2(10, -29)
+
+[node name="Marker2D8" type="Marker2D" parent="EnemySpawns"]
+position = Vector2(-2, -18)
+
 [node name="ChestSpawns" type="Node2D" parent="."]
 
 [node name="Marker2D" type="Marker2D" parent="ChestSpawns"]

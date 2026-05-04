@@ -40,7 +40,8 @@ func setup_room(room_data: Dictionary, map_pos: Vector2i):
 			$DoorCollisions/RightDoor/CollisionShape2D.set_deferred("disabled", true)
 		
 	if room_data["type"] == RoomType.ENEMY:
-		spawn_enemies()
+		var dist = room_data.get("distance", 0)
+		spawn_enemies(dist)
 		
 	if room_data["type"] == RoomType.LOOT:
 		spawn_chest()
@@ -62,7 +63,7 @@ func get_arrival_marker(entry_direction: Vector2i) -> Vector2:
 			
 	return global_position
 	
-func spawn_enemies():
+func spawn_enemies(distance: int):
 	#Get locations
 	if spawn_points_enemy_container == null:
 		print("Error: In scene", self.name, " is no enemyspawner")
@@ -70,8 +71,32 @@ func spawn_enemies():
 	var available_points = spawn_points_enemy_container.get_children()
 	
 	available_points.shuffle()
-	var enemy_count = randi_range(1,3)
 	
+	#Difficulty based on distance froms tart
+	var min_enemies = 1
+	var max_enemies = 1
+	
+	if distance >= 6:
+		min_enemies = 5
+		max_enemies = 7
+	elif distance >= 5:
+		min_enemies = 3
+		max_enemies = 5
+	elif distance >= 4:
+		min_enemies = 3
+		max_enemies = 4
+	elif distance >= 2:
+		min_enemies = 2
+		max_enemies = 3
+	else:
+		min_enemies = 1
+		max_enemies = 2
+		
+	#if more enemies then markers
+	max_enemies = min(max_enemies, available_points.size())
+	min_enemies = min(min_enemies, max_enemies)
+	
+	var enemy_count = randi_range(min_enemies,max_enemies)
 	for i in range(enemy_count):
 		#If no point available
 		if available_points.size() == 0:
