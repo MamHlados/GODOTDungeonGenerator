@@ -2,20 +2,29 @@ extends CharacterBody2D
 
 @onready var camera = $Camera2D
 @onready var anim_sprite = $AnimatedSprite2D
+@onready var weapon_pivot = $WeaponPivot
+@onready var sword_shape = $WeaponPivot/SwordHitBox/CollisionShape2D
+@onready var slash_effect = $WeaponPivot/Effect
 
+
+@export var max_health: int  = 3
 @export var movement_speed = 500
-var character_direction : Vector2
+@export var lunge_speed = -100
 
-var normal_zoom = Vector2(4, 4)
+var character_direction : Vector2
+var current_health: int = 3
+var is_invulnarable: bool = false
+
+var normal_zoom = Vector2(3, 3)
 var whole_map_zoom = Vector2(0.15, 0.15)
 var map_view = false
 
 var last_facing_direction = "down"
-var is_attacking = false
+var is_attacking: bool = false
 
 func _physics_process(delta):
 	if is_attacking:
-		velocity = Vector2.ZERO
+		velocity = velocity.move_toward(Vector2.ZERO, movement_speed * 4 * delta)
 		move_and_slide()
 		return
 		
@@ -84,8 +93,57 @@ func update_animation():
 
 func perform_attack():
 	
-	# is_attacking = true
+	is_attacking = true
+	var attack_dir = Vector2.ZERO
+	
+	match last_facing_direction:
+		"right":
+			weapon_pivot.rotation_degrees = 0
+			attack_dir = Vector2.RIGHT
+		"down":
+			weapon_pivot.rotation_degrees = 90
+			attack_dir = Vector2.DOWN
+		"left":
+			weapon_pivot.rotation_degrees = 180
+			attack_dir = Vector2.LEFT
+		"up":
+			weapon_pivot.rotation_degrees = -90
+			attack_dir = Vector2.UP
+	sword_shape.disabled = false
+	velocity = attack_dir * lunge_speed
 	# anim_sprite.play("attack_" + last_facing_direction)
+	
+	slash_effect.visible = true
+	var slashes = ["Slash1", "Slash2"]
+	slash_effect.play(slashes.pick_random())
+	
+	
 	# await anim_sprite.animation_finished
-	# is_attacking = false
-	pass
+	await slash_effect.animation_finished
+	
+	sword_shape.disabled = true
+	slash_effect.visible = false
+	velocity = Vector2.ZERO
+	
+	await get_tree().create_timer(0.05).timeout
+	is_attacking = false
+
+
+func take_damage(amount: int):
+	if is_invulnarable:
+		return
+	
+	current_health -= amount
+	print("Ahhh got hit!!! xdd")
+	
+	if current_health <= 0:
+		print("You died!")
+	else:
+		is_invulnarable = true
+		await get_tree().create_timer(1.0).timeout
+		is_invulnarable = false
+
+
+func _on_sword_hit_box_body_entered(body):
+	if body.has_method("take_damage"):
+		body.take_damage(4)
