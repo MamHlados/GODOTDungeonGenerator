@@ -3,11 +3,12 @@ class_name BaseEnemy
 
 @export var max_health: int = 10
 @export var speed: int = 40
-@export var detection_radius: float = 120
 
 var current_health: int
 var player_node: CharacterBody2D = null
 var is_awake: bool = false
+var is_knocked_back: bool = false
+var knockback_strength: float = 350.0
 
 func _ready():
 	current_health = max_health
@@ -20,8 +21,16 @@ func wake_up(player: CharacterBody2D):
 func sleep():
 	is_awake = false
 	
-func take_damage(amount: int):
+func take_damage(amount: int, attacker_pos: Vector2):
 	current_health -= amount
+	
+	is_knocked_back = true
+	var knockback_dir = attacker_pos.direction_to(global_position)
+	velocity = knockback_dir * knockback_strength
+	
+	if current_health > 0:
+		await get_tree().create_timer(0.3).timeout
+		is_knocked_back = false
 	if current_health <= 0:
 		die()
 		

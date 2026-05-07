@@ -14,6 +14,9 @@ extends CharacterBody2D
 var character_direction : Vector2
 var current_health: int = 3
 var is_invulnarable: bool = false
+var is_knocked_back: bool = false
+var knockback_strenght: float = 300.0
+
 
 var normal_zoom = Vector2(3, 3)
 var whole_map_zoom = Vector2(0.15, 0.15)
@@ -25,6 +28,11 @@ var is_attacking: bool = false
 func _physics_process(delta):
 	if is_attacking:
 		velocity = velocity.move_toward(Vector2.ZERO, movement_speed * 4 * delta)
+		move_and_slide()
+		return
+	
+	if is_knocked_back:
+		velocity = velocity.move_toward(Vector2.ZERO, movement_speed * delta * 4)
 		move_and_slide()
 		return
 		
@@ -129,21 +137,26 @@ func perform_attack():
 	is_attacking = false
 
 
-func take_damage(amount: int):
+func take_damage(amount: int, attacker_pos: Vector2):
 	if is_invulnarable:
 		return
 	
 	current_health -= amount
 	print("Ahhh got hit!!! xdd")
 	
+	is_knocked_back = true
+	var knockback_dir = attacker_pos.direction_to(global_position)
+	velocity = knockback_dir * knockback_strenght
 	if current_health <= 0:
 		print("You died!")
 	else:
 		is_invulnarable = true
+		await get_tree().create_timer(0.2).timeout
+		is_knocked_back = false
 		await get_tree().create_timer(1.0).timeout
 		is_invulnarable = false
 
 
 func _on_sword_hit_box_body_entered(body):
 	if body.has_method("take_damage"):
-		body.take_damage(4)
+		body.take_damage(4, global_position)
