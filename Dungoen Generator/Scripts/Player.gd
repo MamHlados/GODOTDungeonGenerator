@@ -15,7 +15,7 @@ var character_direction : Vector2
 var current_health: int = 3
 var is_invulnarable: bool = false
 var is_knocked_back: bool = false
-var knockback_strenght: float = 300.0
+var knockback_strength: float = 300.0
 
 
 var normal_zoom = Vector2(3, 3)
@@ -133,7 +133,7 @@ func perform_attack():
 	slash_effect.visible = false
 	velocity = Vector2.ZERO
 	
-	await get_tree().create_timer(0.05).timeout
+	await get_tree().create_timer(0.01).timeout
 	is_attacking = false
 
 
@@ -146,7 +146,7 @@ func take_damage(amount: int, attacker_pos: Vector2):
 	
 	is_knocked_back = true
 	var knockback_dir = attacker_pos.direction_to(global_position)
-	velocity = knockback_dir * knockback_strenght
+	velocity = knockback_dir * knockback_strength
 	if current_health <= 0:
 		print("You died!")
 	else:
@@ -160,3 +160,9 @@ func take_damage(amount: int, attacker_pos: Vector2):
 func _on_sword_hit_box_body_entered(body):
 	if body.has_method("take_damage"):
 		body.take_damage(4, global_position)
+
+
+func _on_hurt_box_area_entered(area):
+	var attacker = area.get_parent()
+	if attacker is BaseEnemy:
+		take_damage(1, attacker.global_position)

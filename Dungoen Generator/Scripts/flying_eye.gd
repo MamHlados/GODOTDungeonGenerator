@@ -2,29 +2,67 @@ extends BaseEnemy
 
 var is_chasing_player: bool = false
 
+enum EyeState {REST, CHARGE, DASH}
+var current_state = EyeState.REST
+var state_timer: float = 0.0
+var dash_direction: Vector2 = Vector2.ZERO
+
+@export var dash_speed: float = 200.0
+@export var charge_time: float = 0.8
+@export var dash_time: float = 0.4
+@export var rest_time: float = 1.0
+
+@onready var sprite = $Sprite2D
 func _physics_process(delta):
 	if is_knocked_back:
-		velocity = velocity.move_toward(Vector2.ZERO, speed * 4 * delta)
+		velocity = velocity.move_toward(Vector2.ZERO, dash_speed * 4 * delta)
+		current_state = EyeState.REST
+		state_timer = rest_time
+		sprite.modulate = Color.WHITE
 		move_and_slide()
 		return
 		
-	if is_awake and is_chasing_player and player_node !=null:
-		var direction = global_position.direction_to(player_node.global_position)
-		velocity = direction * speed
+	if not is_awake or not is_chasing_player or player_node == null:
+		velocity = velocity.move_toward(Vector2.ZERO, dash_speed * 4 * delta)
 		move_and_slide()
-	else:
-		velocity = Vector2.ZERO
+		return
+	
+	state_timer -= delta
+	
+	match current_state:
+		
+		EyeState.REST:
+			velocity = velocity.move_toward(Vector2.ZERO, dash_speed * 4 * delta)
+			if state_timer <= 0:
+				current_state = EyeState.CHARGE
+				state_timer = charge_time
+				sprite.modulate = Color.RED
+		EyeState.CHARGE:
+			velocity = velocity.move_toward(Vector2.ZERO, dash_speed * 4 * delta)
+			if state_timer <= 0:
+				dash_direction = global_position.direction_to(player_node.global_position)
+				current_state = EyeState.DASH
+				state_timer = dash_time
+				sprite.modulate = Color.WHITE
+		EyeState.DASH:
+			velocity = dash_direction * dash_speed
+			if state_timer <= 0:
+				current_state = EyeState.REST
+				state_timer = rest_time
+	move_and_slide()
+
 
 func _on_detection_zone_body_entered(body):
-	print("Jdu za tebou!!")
 	if body.name == "Player":
-		is_chasing_player = true
-
+		if not is_chasing_player:
+			print("Útok")
+			is_chasing_player = true
+			current_state = EyeState.CHARGE
+			state_timer = charge_time
+			sprite.modulate = Color.RED
+	
 #func _on_detection_zone_body_exited(body):
 #	if body.name == "Player":
 #		is_chasing_player = false
 
 
-func _on_hit_box_body_entered(body):
-	if body.name == "Player" and body.has_method("take_damage"):
-		body.take_damage(1, global_position)

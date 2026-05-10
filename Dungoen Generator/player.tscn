@@ -1,4 +1,4 @@
-[gd_scene load_steps=46 format=3 uid="uid://clax01c8sxwl8"]
+[gd_scene load_steps=47 format=3 uid="uid://clax01c8sxwl8"]
 
 [ext_resource type="Script" path="res://Scripts/Player.gd" id="1_va5mm"]
 [ext_resource type="Texture2D" uid="uid://dy0m8ln8w53qs" path="res://Assets/Player/PlayerCharacter.png" id="2_t3u5c"]
@@ -308,6 +308,10 @@ animations = [{
 "speed": 20.0
 }]
 
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_l0t0b"]
+radius = 5.0
+height = 20.0
+
 [node name="Player" type="CharacterBody2D"]
 z_index = 10
 collision_mask = 6
@@ -315,7 +319,7 @@ motion_mode = 1
 script = ExtResource("1_va5mm")
 movement_speed = 100
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="PhysicsBody" type="CollisionShape2D" parent="."]
 position = Vector2(0, 9)
 shape = SubResource("CapsuleShape2D_rkt0c")
 
@@ -343,4 +347,13 @@ position = Vector2(14, 1)
 sprite_frames = SubResource("SpriteFrames_s1wrl")
 animation = &"Slash2"
 
+[node name="HurtBox" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 4
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HurtBox"]
+position = Vector2(0, 1)
+shape = SubResource("CapsuleShape2D_l0t0b")
+
 [connection signal="body_entered" from="WeaponPivot/SwordHitBox" to="." method="_on_sword_hit_box_body_entered"]
+[connection signal="area_entered" from="HurtBox" to="." method="_on_hurt_box_area_entered"]
