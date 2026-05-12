@@ -10,7 +10,7 @@ func _create_layout() -> void:
 	if bounds < 2: bounds = 2
 	
 	var dirs = [Vector2i.UP, Vector2i.DOWN, Vector2i.LEFT, Vector2i.RIGHT]
-	var spawn_dir = dirs.pick_random()
+	var spawn_dir = _get_main_direction()
 	
 	var start_rect: Rect2i
 	
@@ -66,7 +66,7 @@ func _create_layout() -> void:
 		var random_existing_room = taken_positions.pick_random()
 		
 		if random_existing_room == Vector2i.ZERO: continue
-		var step_dir = dirs.pick_random()
+		var step_dir = _get_biased_direction()
 		var pad_pos = random_existing_room + step_dir
 		
 		var is_next_to_start = (abs(pad_pos.x) + abs(pad_pos.y) == 1)
@@ -80,7 +80,7 @@ func _create_layout() -> void:
 func _split_space(rect: Rect2i, current_depth: int) -> Array[Rect2i]:
 	if current_depth == 0: return [rect]
 	
-	var split_horizontally = randf() > 0.5
+	var split_horizontally = _get_biased_direction()
 	if rect.size.x > rect.size.y * 1.5: split_horizontally = false
 	elif rect.size.y > rect.size.x * 1.5: split_horizontally = true
 	
@@ -124,3 +124,14 @@ func _create_corridor(start: Vector2i, end: Vector2i) -> void:
 		if _get_room_data(current) == null:
 			_set_room_data(current, {"grid_pos": current, "type": RoomType.NORMAL})
 			taken_positions.append(current)
+
+func _should_split_horizontally() -> bool:
+	var roll = randf()
+	match current_preset:
+		1, 2: #TOWER - UP, CAVE - DOWN
+			return roll < 0.75
+		3, 4: # SIDE - LEFT, SIDE - RIGHT
+			return roll < 0.25 
+		_, 0: #BASIC
+			return roll < 0.5
+		

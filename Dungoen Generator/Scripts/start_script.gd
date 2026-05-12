@@ -22,9 +22,9 @@ func _ready() -> void:
 		RWgen.queue_free()
 		
 	activate_generator.number_of_rooms = GeneratorSettings.num_rooms
-	#activate_generator.current_preset = GeneratorSettings.preset_id
-	#activate_generator.animate_generation = GeneratorSettings.animate
-	#activate_generator.difficulty = GeneratorSettings.difficulty_id
+	activate_generator.current_preset = GeneratorSettings.preset_id
+	activate_generator.animate_generation = GeneratorSettings.animate
+	activate_generator.difficulty = GeneratorSettings.difficulty_id
 	
 	
 	print("GENERACE MAPY")

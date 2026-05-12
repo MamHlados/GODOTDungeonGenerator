@@ -22,18 +22,21 @@ func _create_layout() -> void:
 		safety_counter += 1
 
 func _spawn_forced_neighbor(start_pos: Vector2i) -> void:
-	var dirs = [Vector2i.UP, Vector2i.DOWN, Vector2i.LEFT, Vector2i.RIGHT]
-	var new_pos = start_pos + dirs.pick_random()
+	var new_pos = start_pos + _get_biased_direction()
 	
 	_set_room_data(new_pos, {"grid_pos": new_pos, "type": RoomType.NORMAL})
 	taken_positions.append(new_pos)
 
 func _find_valid_new_position() -> Vector2i:
 	for i in range(50):
-		var index = randi_range(1, taken_positions.size() - 1)
+		var index = 0
+		if randf() < 0.6:
+			index = taken_positions.size() - 1
+		else:
+			index = randi_range(1, taken_positions.size() - 1)
 		var base_pos = taken_positions[index]
-		var checking_pos = base_pos + [Vector2i.UP, Vector2i.DOWN, Vector2i.LEFT, Vector2i.RIGHT].pick_random()
-
+		var checking_pos = base_pos + _get_biased_direction()
+		
 		if _is_pos_valid(checking_pos):
 			return checking_pos
 	return Vector2i(999, 999)

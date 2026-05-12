@@ -8,8 +8,11 @@ class_name BaseGenerator
 var tiles: int = 35
 var tile_size:int = 16
 @export var room_pixel_size: Vector2 = Vector2(tiles * tile_size, tiles * tile_size)
-
 @onready var map_root: Node2D = %Map
+
+var current_preset: int = 0
+var difficulty: int = 2
+var animate_generation: bool = false
 
 const ROOM_SCENES = {
 	1:[ preload("res://ScenesRooms/From_master_roomV2/V2U.tscn"),
@@ -28,7 +31,7 @@ const ROOM_SCENES = {
 	9:[ preload("res://ScenesRooms/From_master_roomV2/V2LU.tscn"),],
 	10:[ preload("res://ScenesRooms/From_master_roomV2/V2DL.tscn"),],
 	11:[ preload("res://ScenesRooms/From_master_roomV2/V2DLU.tscn"),
-		 preload("res://ScenesRooms/from_master_roomV4/V4DLR.tscn"),],
+		 preload("res://ScenesRooms/from_master_roomV4/V4DLU.tscn"),],
 	12:[ preload("res://ScenesRooms/From_master_roomV2/V2LR.tscn"),],
 	13:[ preload("res://ScenesRooms/From_master_roomV2/V2LRU.tscn"),
 		 preload("res://ScenesRooms/from_master_roomV4/V4LRU.tscn"),],
@@ -40,7 +43,7 @@ const ROOM_SCENES = {
 
 enum RoomType { NORMAL, START, BOSS, LOOT, SHOP, ENEMY, BUFF, KEY, EMPTY, TRAP }
 
-var friendly_types = [RoomType.START, RoomType.LOOT, RoomType.SHOP, RoomType.EMPTY]
+var friendly_types = [RoomType.START, RoomType.LOOT, RoomType.SHOP, RoomType.BUFF]
 
 const TYPE_COLORS = {
 	RoomType.NORMAL: Color.WHITE,
@@ -63,10 +66,50 @@ func _ready() -> void:
 	var max_capacity = (world_size.x * 2) * (world_size.y * 2)
 	if number_of_rooms >= max_capacity:
 		number_of_rooms = int(max_capacity * 0.8)
+		
+func _get_main_direction() -> Vector2i:
+	match current_preset:
+		1: return Vector2i.UP
+		2: return Vector2i.DOWN
+		3: return Vector2i.LEFT
+		4: return Vector2i.RIGHT
+		_, 0: return [Vector2i.UP, Vector2i.DOWN, Vector2i.LEFT, Vector2i.RIGHT].pick_random()
+		
+func _get_biased_direction() -> Vector2i:
+	var roll = randf()
+	match current_preset:
+		1: #TOWER - UP
+			if roll < 0.6: return Vector2i.UP
+			elif roll < 0.8: return Vector2i.LEFT
+			else: return Vector2i.RIGHT
+		2: #CAVE - DOWN
+			if roll < 0.6: return Vector2i.DOWN
+			elif roll < 0.8: return Vector2i.LEFT
+			else: return Vector2i.RIGHT
+		3: #SIDE - LEFT
+			if roll < 0.6: return Vector2i.LEFT
+			elif roll < 0.8: return Vector2i.UP
+			else: return Vector2i.DOWN
+		4: #SIDE - RIGHT
+			if roll < 0.6: return Vector2i.RIGHT
+			elif roll < 0.8: return Vector2i.UP
+			else: return Vector2i.DOWN
+		_, 0: #BASIC
+			return [Vector2i.UP, Vector2i.DOWN, Vector2i.LEFT, Vector2i.RIGHT].pick_random()
 
+			
 func generate_dungeon() -> void:
 	print("Generating Dungeon...")
+	var needed_size = int(sqrt(number_of_rooms)) + 2
 	
+	#PRESET - SIDES
+	if current_preset == 3 or current_preset == 4:
+		world_size = Vector2i(needed_size * 1.2, needed_size / 2)
+	#PRESET - TOWER NEBO CAVE
+	elif current_preset == 1 or current_preset == 2:
+		world_size = Vector2i(needed_size / 2, needed_size * 1.2)
+	else:
+		world_size = Vector2i(needed_size, needed_size)
 	# 1. Setup Grid
 	_initialize_grid()
 	
@@ -137,10 +180,26 @@ func _assign_room_types_and_gameplay() -> void:
 	early_spots.shuffle()
 	late_spots.shuffle()
 	
-	#Must spawns
-	var late_items = [RoomType.SHOP, RoomType.BUFF, RoomType.EMPTY, RoomType.TRAP]
-	var early_items = [RoomType.LOOT, RoomType.EMPTY, RoomType.BUFF, RoomType.TRAP, RoomType.TRAP, RoomType.LOOT]
+	#SCALLING podle velikosti a difficulty
+	var total_rooms = taken_positions.size()
 	
+	#Výpočet pomocí procent
+	var shop_count = max(1, int(total_rooms * 0.05))
+	var loot_count = max(1, int(total_rooms * (0.15 - (difficulty * 0.02))))
+	var buff_count = max(1, int(total_rooms * 0.08))
+	var trap_count = max(1, int(total_rooms * (0.02 + (difficulty * 0.03))))
+	
+	#Must spawns
+	var late_items = []
+	var early_items = []
+	
+	for i in range(shop_count): late_items.append(RoomType.SHOP)
+	for i in range(buff_count / 2): late_items.append(RoomType.BUFF)
+	for i in range(trap_count / 2): late_items.append(RoomType.TRAP)
+	
+	for i in range(loot_count): early_items.append(RoomType.LOOT)
+	for i in range(buff_count / 2): early_items.append(RoomType.BUFF)
+	for i in range(trap_count / 2): early_items.append(RoomType.TRAP)
 	#5. Assign late items
 	for item in late_items:
 		if late_spots.size() > 0:
@@ -160,11 +219,13 @@ func _assign_room_types_and_gameplay() -> void:
 			var pos = _pop_safe_spot(late_spots)
 			_get_room_data(pos)["type"] = item
 	
-	#7. Fill the rest with Enemies room
-	for pos in late_spots:
-		_get_room_data(pos)["type"] = RoomType.ENEMY
-	for pos in early_spots:
-		_get_room_data(pos)["type"] = RoomType.ENEMY
+	#Difficulty
+	var enemy_chance = float(difficulty) / 4.0
+	for pos in late_spots + early_spots:
+		if randf() <= enemy_chance:
+			_get_room_data(pos)["type"] = RoomType.ENEMY
+		else:
+			_get_room_data(pos)["type"] = RoomType.EMPTY
 
 func _instantiate_scenes() -> void:
 	for pos in taken_positions:
@@ -200,6 +261,8 @@ func _instantiate_scenes() -> void:
 			
 			if instance.has_method("setup_room"):
 				instance.setup_room(room_data, pos)
+		if animate_generation:
+			await get_tree().create_timer(0.02).timeout
 
 func _calculate_distances_from_start() -> Dictionary:
 	var start_pos = Vector2i.ZERO
