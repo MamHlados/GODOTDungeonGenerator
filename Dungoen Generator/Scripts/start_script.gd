@@ -1,39 +1,38 @@
 extends Node2D
 
-@onready var ui_menu = $UI
-@onready var RWbutton = $UI/Control/VBoxContainer/RANDOMWALK_BUTTON
-@onready var BSPbutton = $UI/Control/VBoxContainer/BSP_BUTTON
-
 @onready var RWgen = $RWgen
 @onready var BSPgen = $BSPgen
 
 var game_started: bool = false
 
 func _ready() -> void:
-	ui_menu.show()
+	if GeneratorSettings.dungeon_seed != "":
+		seed(GeneratorSettings.dungeon_seed.hash())
+		print("Vlastní seed: ", GeneratorSettings.dungeon_seed)
+	else:
+		randomize()
+		print("Nahodny seed")
 	
-func _on_randomwalk_button_pressed():
-	_start_generation("random_walk")
+	var activate_generator = null
+	if GeneratorSettings.chosen_algorithm == "RandomWalk":
+		activate_generator = RWgen
+		BSPgen.queue_free()
+	else:
+		activate_generator = BSPgen
+		RWgen.queue_free()
+		
+	activate_generator.number_of_rooms = GeneratorSettings.num_rooms
+	#activate_generator.current_preset = GeneratorSettings.preset_id
+	#activate_generator.animate_generation = GeneratorSettings.animate
+	#activate_generator.difficulty = GeneratorSettings.difficulty_id
+	
+	
+	print("GENERACE MAPY")
+	print("Algoritmus: ", GeneratorSettings.chosen_algorithm)
+	activate_generator.generate_dungeon()
 
-func _on_bsp_button_pressed():
-	_start_generation("bsp")
-	
 func _input(event: InputEvent) -> void:
-	if event.is_action_pressed("random_walk"):
-		_start_generation("random_walk")
-	elif event.is_action_pressed("bsp"):
-		_start_generation("bsp")
-			
-func _start_generation(type: String) -> void:
-	ui_menu.hide()
-	
-	RWgen._initialize_grid()
-	BSPgen._initialize_grid()
-	
-	if type == "random_walk":
-		print("Random walk generated")
-		RWgen.generate_dungeon()
-	elif type == "bsp":
-		print("BSP generated")
-		BSPgen.generate_dungeon()
+	if event.is_action_pressed("ui_cancel"):
+		get_tree().change_scene_to_file("res://menu.tscn")
+
 	

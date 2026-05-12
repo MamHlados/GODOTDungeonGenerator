@@ -1,0 +1,5 @@
+[gd_resource type="ButtonGroup" format=3 uid="uid://co5m7iu3k6225"]
+
+[resource]
+resource_name = "GeneratorGroup"
+allow_unpress = true

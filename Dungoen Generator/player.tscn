@@ -343,6 +343,7 @@ rotation = 1.56413
 shape = SubResource("CapsuleShape2D_rqcmq")
 
 [node name="Effect" type="AnimatedSprite2D" parent="WeaponPivot"]
+visible = false
 position = Vector2(14, 1)
 sprite_frames = SubResource("SpriteFrames_s1wrl")
 animation = &"Slash2"
