@@ -9,6 +9,8 @@ var tiles: int = 35
 var tile_size:int = 16
 @export var room_pixel_size: Vector2 = Vector2(tiles * tile_size, tiles * tile_size)
 @onready var map_root: Node2D = %Map
+@onready var void_tilemap: TileMap = %VoidDecorationsTileMap
+var bg_rect: ColorRect
 
 var current_preset: int = 0
 var difficulty: int = 2
@@ -40,6 +42,41 @@ const ROOM_SCENES = {
 	15:[ preload("res://ScenesRooms/From_master_roomV2/V2DLRU.tscn"),
 		 preload("res://ScenesRooms/from_master_roomV4/V4DLRU.tscn"),]
 }
+var flower_tiles: Array[Vector2i] = [
+	Vector2i(3,9),
+	Vector2i(4,9),
+	Vector2i(5,9),
+	Vector2i(6,9),
+	Vector2i(7,9),
+	Vector2i(8,9),
+	Vector2i(9,9),
+	Vector2i(10,9),
+	Vector2i(11,9),
+	Vector2i(12,9),
+	Vector2i(13,9),
+	Vector2i(14,9),
+	Vector2i(3,10),
+	Vector2i(4,10),
+	Vector2i(5,10),
+	Vector2i(6,10),
+	Vector2i(7,10),
+	Vector2i(8,10),
+	Vector2i(9,10),
+	Vector2i(10,10),
+	Vector2i(11,10),
+	Vector2i(12,10),
+	Vector2i(13,10),
+	Vector2i(14,10),
+	Vector2i(8,11),
+	Vector2i(9,11),
+	Vector2i(10,11),
+	Vector2i(11,11),
+	Vector2i(12,11),
+	Vector2i(13,11),
+	Vector2i(14,11)
+]
+var decoration_layer: int = 0
+var source_id: int = 0
 
 enum RoomType { NORMAL, START, BOSS, LOOT, SHOP, ENEMY, BUFF, KEY, EMPTY, TRAP }
 
@@ -124,6 +161,9 @@ func generate_dungeon() -> void:
 	
 	# 5. Draw
 	_instantiate_scenes()
+	
+	# 6. Draw decorations
+	_decorate_void()
 
 func _initialize_grid() -> void:
 	rooms.clear()
@@ -372,4 +412,35 @@ func _on_player_transition	(current_pos: Vector2i, direction: Vector2i, player: 
 			next_room_node.activate_room(player)
 		
 	
-
+func _decorate_void() -> void:
+	# VOID
+	if bg_rect == null:
+		bg_rect = ColorRect.new()
+		bg_rect.color = Color.BLACK 
+		bg_rect.size = Vector2(100000, 100000) 
+		bg_rect.position = Vector2(-50000, -50000) 
+		bg_rect.z_index = -100 
+		add_child(bg_rect)
+		
+	# FLOWERS
+	void_tilemap.clear()
+	var world_pixel_bounds = world_size * tiles
+	var padding = 20
+	
+	var min_x = -world_pixel_bounds.x - padding
+	var max_x = world_pixel_bounds.x + padding
+	var min_y = -world_pixel_bounds.y - padding
+	var max_y = world_pixel_bounds.y + padding
+	
+	var total_area = (max_x - min_x) * (max_y - min_y)
+	
+	# Hustota kytek
+	var number_of_flowers = int(total_area * 0.05) 
+	
+	for i in range(number_of_flowers):
+		var rand_x = randi_range(min_x, max_x)
+		var rand_y = randi_range(min_y, max_y)
+		var tile_pos = Vector2i(rand_x, rand_y)
+		
+		var random_flower = flower_tiles.pick_random()
+		void_tilemap.set_cell(decoration_layer, tile_pos, source_id, random_flower)

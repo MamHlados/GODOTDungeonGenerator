@@ -341,6 +341,7 @@ collision_mask = 4
 position = Vector2(8, 0)
 rotation = 1.56413
 shape = SubResource("CapsuleShape2D_rqcmq")
+disabled = true
 
 [node name="Effect" type="AnimatedSprite2D" parent="WeaponPivot"]
 visible = false
