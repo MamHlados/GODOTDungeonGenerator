@@ -103,6 +103,10 @@ func _ready() -> void:
 	var max_capacity = (world_size.x * 2) * (world_size.y * 2)
 	if number_of_rooms >= max_capacity:
 		number_of_rooms = int(max_capacity * 0.8)
+
+func _input(_event: InputEvent) -> void:
+	if Input.is_action_just_pressed("ui_accept"):
+		generate_dungeon()
 		
 func _get_main_direction() -> Vector2i:
 	match current_preset:
@@ -260,12 +264,21 @@ func _assign_room_types_and_gameplay() -> void:
 			_get_room_data(pos)["type"] = item
 	
 	#Difficulty
+	var remaining_spots = late_spots + early_spots
+	remaining_spots.shuffle()
 	var enemy_chance = float(difficulty) / 4.0
-	for pos in late_spots + early_spots:
-		if randf() <= enemy_chance:
-			_get_room_data(pos)["type"] = RoomType.ENEMY
-		else:
-			_get_room_data(pos)["type"] = RoomType.EMPTY
+	var total_enemies = int(remaining_spots.size() * enemy_chance)
+	
+	var fillers = []
+	for i in range(total_enemies):
+		fillers.append(RoomType.ENEMY)
+	while fillers.size() < remaining_spots.size():
+		fillers.append(RoomType.EMPTY)
+		
+	fillers.shuffle()
+	for i in range(remaining_spots.size()):
+		var pos = remaining_spots[i]
+		_get_room_data(pos)["type"] = fillers[i]
 
 func _instantiate_scenes() -> void:
 	for pos in taken_positions:
@@ -423,6 +436,7 @@ func _decorate_void() -> void:
 		add_child(bg_rect)
 		
 	# FLOWERS
+	
 	void_tilemap.clear()
 	var world_pixel_bounds = world_size * tiles
 	var padding = 20
@@ -444,3 +458,4 @@ func _decorate_void() -> void:
 		
 		var random_flower = flower_tiles.pick_random()
 		void_tilemap.set_cell(decoration_layer, tile_pos, source_id, random_flower)
+		

@@ -328,7 +328,7 @@ sprite_frames = SubResource("SpriteFrames_vibqa")
 animation = &"walk_up"
 
 [node name="Camera2D" type="Camera2D" parent="."]
-zoom = Vector2(4, 4)
+zoom = Vector2(3, 3)
 
 [node name="WeaponPivot" type="Node2D" parent="."]
 

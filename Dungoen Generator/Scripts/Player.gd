@@ -19,7 +19,7 @@ var knockback_strength: float = 300.0
 
 
 var normal_zoom = Vector2(3, 3)
-var whole_map_zoom = Vector2(0.15, 0.15)
+var whole_map_zoom = Vector2(0.1, 0.1)
 var map_view = false
 
 var last_facing_direction = "down"
