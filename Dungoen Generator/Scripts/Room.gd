@@ -3,7 +3,10 @@ extends Node2D
 @onready var spawn_points_enemy_container = $EnemySpawns
 @onready var spawn_points_chest_container = $ChestSpawns
 
-const ENEMY_SCENE = preload("res://flying_eye.tscn")
+const ENEMY_SCENE: Array[PackedScene] = [
+	preload("res://flying_eye.tscn"),
+	preload("res://frog.tscn")
+]
 const CHEST_SCENE = preload("res://chest.tscn")
 
 enum RoomType { NORMAL, START, BOSS, LOOT, SHOP, ENEMY, BUFF, KEY, EMPTY }
@@ -103,7 +106,8 @@ func spawn_enemies(distance: int):
 			break
 		#Take the first point in the list
 		var point = available_points.pop_front()
-		var enemy = ENEMY_SCENE.instantiate()
+		var random_enemy = ENEMY_SCENE.pick_random()
+		var enemy = random_enemy.instantiate()
 		
 		enemy.position = point.position
 		add_child(enemy)

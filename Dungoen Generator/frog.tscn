@@ -1,0 +1,93 @@
+[gd_scene load_steps=14 format=3 uid="uid://ds7jdlwsdrvvt"]
+
+[ext_resource type="Script" path="res://Scripts/frog.gd" id="1_jlxdn"]
+[ext_resource type="Texture2D" uid="uid://cmbh8l0nfpvci" path="res://Assets/Frog.png" id="1_l4tbk"]
+[ext_resource type="Texture2D" uid="uid://ttvx0jh4y5x1" path="res://Assets/Frog_spritesheet.png" id="3_aikdm"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_pguth"]
+radius = 6.99992
+height = 20.0094
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3uqoh"]
+atlas = ExtResource("1_l4tbk")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5qm6b"]
+atlas = ExtResource("1_l4tbk")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0ok3f"]
+atlas = ExtResource("1_l4tbk")
+region = Rect2(64, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_j6kc4"]
+atlas = ExtResource("1_l4tbk")
+region = Rect2(96, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2w3cg"]
+atlas = ExtResource("1_l4tbk")
+region = Rect2(128, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_m1ial"]
+atlas = ExtResource("1_l4tbk")
+region = Rect2(160, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qddpv"]
+atlas = ExtResource("1_l4tbk")
+region = Rect2(192, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ttqu6"]
+atlas = ExtResource("1_l4tbk")
+region = Rect2(224, 0, 32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_q0cr0"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_3uqoh")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_5qm6b")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0ok3f")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_j6kc4")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2w3cg")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_m1ial")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qddpv")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ttqu6")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[node name="Frog" type="CharacterBody2D"]
+collision_layer = 4
+collision_mask = 15
+script = ExtResource("1_jlxdn")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(1, -7)
+rotation = -1.57563
+shape = SubResource("CapsuleShape2D_pguth")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+visible = false
+position = Vector2(0, -13)
+sprite_frames = SubResource("SpriteFrames_q0cr0")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(0, -16)
+texture = ExtResource("3_aikdm")
+vframes = 8
