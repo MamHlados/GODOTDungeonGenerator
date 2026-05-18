@@ -1,6 +1,8 @@
 extends Node2D
 class_name BaseGenerator
 
+signal generation_complete
+
 @export_group("Settings")
 #Grid
 @export var world_size: Vector2i = Vector2i(6, 6) 
@@ -164,10 +166,12 @@ func generate_dungeon() -> void:
 	_assign_room_types_and_gameplay() 
 	
 	# 5. Draw
-	_instantiate_scenes()
+	await _instantiate_scenes()
 	
 	# 6. Draw decorations
 	_decorate_void()
+	
+	generation_complete.emit()
 
 func _initialize_grid() -> void:
 	rooms.clear()
@@ -206,19 +210,21 @@ func _assign_room_types_and_gameplay() -> void:
 	_get_room_data(key_pos)["type"] = RoomType.KEY
 	
 	# 4. Available spots
-	var early_spots = []
-	var late_spots = []
-	
+	var available_spots = []
+		
 	for pos in taken_positions:
 		var room = _get_room_data(pos)
 		room ["distance"] = distances.get(pos,0)
-		if room["type"] != RoomType.NORMAL: continue
-		
-		var dist = distances.get(pos, 0)
-		if dist <= 4:
-			early_spots.append(pos)
-		else:
-			late_spots.append(pos)
+		if room["type"] == RoomType.NORMAL: 
+			available_spots.append(pos)
+			
+	available_spots.sort_custom(func(a,b):
+		return distances.get(a,0) < distances.get (b,0)
+	)
+	var mid_point = available_spots.size() /2
+	var early_spots = available_spots.slice(0 , mid_point)
+	var late_spots = available_spots.slice(mid_point, available_spots.size())
+	
 	
 	#Shuffle
 	early_spots.shuffle()
@@ -233,34 +239,35 @@ func _assign_room_types_and_gameplay() -> void:
 	var buff_count = max(1, int(total_rooms * 0.08))
 	var trap_count = max(1, int(total_rooms * (0.02 + (difficulty * 0.03))))
 	
+	
 	#Must spawns
 	var late_items = []
 	var early_items = []
 	
 	for i in range(shop_count): late_items.append(RoomType.SHOP)
-	for i in range(buff_count / 2): late_items.append(RoomType.BUFF)
-	for i in range(trap_count / 2): late_items.append(RoomType.TRAP)
+	for i in range(buff_count): late_items.append(RoomType.BUFF)
+	for i in range(trap_count): late_items.append(RoomType.TRAP)
 	
 	for i in range(loot_count): early_items.append(RoomType.LOOT)
-	for i in range(buff_count / 2): early_items.append(RoomType.BUFF)
-	for i in range(trap_count / 2): early_items.append(RoomType.TRAP)
+	for i in range(buff_count - (buff_count / 2)): early_items.append(RoomType.BUFF)
+	for i in range(trap_count - (trap_count / 2)): early_items.append(RoomType.TRAP)
 	#5. Assign late items
 	for item in late_items:
 		if late_spots.size() > 0:
-			var pos = _pop_safe_spot(late_spots)
+			var pos = _pop_safe_spot(late_spots, item)
 			_get_room_data(pos)["type"] = item
 		#Map too small(fat so it wont spawn late items)
 		elif early_spots.size() > 0:
-			var pos = _pop_safe_spot(early_spots)
+			var pos = _pop_safe_spot(early_spots, item)
 			_get_room_data(pos)["type"] = item
 		
 	#6. Assign early items
 	for item in early_items:
 		if early_spots.size() > 0:
-			var pos = _pop_safe_spot(early_spots)
+			var pos = _pop_safe_spot(early_spots, item)
 			_get_room_data(pos)["type"] = item
 		elif late_spots.size() > 0:
-			var pos = _pop_safe_spot(late_spots)
+			var pos = _pop_safe_spot(late_spots, item)
 			_get_room_data(pos)["type"] = item
 	
 	#Difficulty
@@ -279,7 +286,7 @@ func _assign_room_types_and_gameplay() -> void:
 	for i in range(remaining_spots.size()):
 		var pos = remaining_spots[i]
 		_get_room_data(pos)["type"] = fillers[i]
-
+		
 func _instantiate_scenes() -> void:
 	for pos in taken_positions:
 		var room_data = _get_room_data(pos)
@@ -315,7 +322,7 @@ func _instantiate_scenes() -> void:
 			if instance.has_method("setup_room"):
 				instance.setup_room(room_data, pos)
 		if animate_generation:
-			await get_tree().create_timer(0.02).timeout
+			await get_tree().create_timer(0.1).timeout
 
 func _calculate_distances_from_start() -> Dictionary:
 	var start_pos = Vector2i.ZERO
@@ -397,12 +404,25 @@ func _has_friendly_neighbor(pos: Vector2i) -> bool:
 				return true
 	return false
 	
-func _pop_safe_spot(spots_list: Array) -> Vector2i:
+func _pop_safe_spot(spots_list: Array, intended_type: RoomType) -> Vector2i:
 	for i in range (spots_list.size()):
 		var pos = spots_list[i]
 		if not _has_friendly_neighbor(pos):
 			return spots_list.pop_at(i)
+	for i in range (spots_list.size()):
+		var pos = spots_list[i]
+		if not _has_neighbor_of_type(pos, intended_type):
+			return spots_list.pop_at(i)
+			
 	return spots_list.pop_front()
+
+func _has_neighbor_of_type(pos: Vector2i, type: RoomType) -> bool:
+	for offset in [Vector2i.UP, Vector2i.DOWN, Vector2i.RIGHT, Vector2i.LEFT]:
+		var neighbor_data = _get_room_data(pos + offset)
+		if neighbor_data != null and neighbor_data.has("type"):
+			if  neighbor_data["type"] == type:
+				return true
+	return false
 	
 func _on_player_transition	(current_pos: Vector2i, direction: Vector2i, player: CharacterBody2D):
 	#Position of the next door

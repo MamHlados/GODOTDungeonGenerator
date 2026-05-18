@@ -4,6 +4,7 @@ extends Node2D
 @onready var BSPgen = $BSPgen
 
 var game_started: bool = false
+var overview_camera: Camera2D
 
 func _ready() -> void:
 	if GeneratorSettings.dungeon_seed != "":
@@ -26,6 +27,11 @@ func _ready() -> void:
 	activate_generator.animate_generation = GeneratorSettings.animate
 	activate_generator.difficulty = GeneratorSettings.difficulty_id
 	
+	if GeneratorSettings.animate:
+		overview_camera = Camera2D.new()
+		add_child(overview_camera)
+		overview_camera.make_current()
+		overview_camera.zoom = Vector2(0.1,0.1)
 	
 	print("GENERACE MAPY")
 	print("Algoritmus: ", GeneratorSettings.chosen_algorithm)
@@ -34,5 +40,11 @@ func _ready() -> void:
 func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):
 		get_tree().change_scene_to_file("res://menu.tscn")
+
+func _on_generation_finished():
+	print("Animace ukončena")
+	
+	if overview_camera != null:
+		overview_camera.queue_free()
 
 	
