@@ -13,7 +13,7 @@ radius = 90.3549
 [node name="FlyingEye" type="CharacterBody2D"]
 z_index = 2
 collision_layer = 4
-collision_mask = 15
+collision_mask = 10
 script = ExtResource("1_y42uu")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
@@ -25,18 +25,18 @@ collision_layer = 0
 [node name="CollisionShape2D" type="CollisionShape2D" parent="DetectionZone"]
 shape = SubResource("CircleShape2D_i1oji")
 
-[node name="HitBox" type="Area2D" parent="."]
+[node name="HurtBox" type="Area2D" parent="."]
 collision_layer = 4
 collision_mask = 0
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="HitBox"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HurtBox"]
 position = Vector2(0, -1)
 shape = SubResource("CircleShape2D_qbr08")
 
-[node name="Hurtbox" type="CollisionShape2D" parent="."]
+[node name="Hitbox" type="CollisionShape2D" parent="."]
 position = Vector2(0, -1)
 shape = SubResource("CircleShape2D_qjx8d")
 
 [connection signal="body_entered" from="DetectionZone" to="." method="_on_detection_zone_body_entered"]
 [connection signal="body_exited" from="DetectionZone" to="." method="_on_detection_zone_body_exited"]
-[connection signal="body_entered" from="HitBox" to="." method="_on_hit_box_body_entered"]
+[connection signal="body_entered" from="HurtBox" to="." method="_on_hit_box_body_entered"]

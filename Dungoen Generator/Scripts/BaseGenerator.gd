@@ -322,7 +322,7 @@ func _instantiate_scenes() -> void:
 			if instance.has_method("setup_room"):
 				instance.setup_room(room_data, pos)
 		if animate_generation:
-			await get_tree().create_timer(0.1).timeout
+			await get_tree().create_timer(0.3).timeout
 
 func _calculate_distances_from_start() -> Dictionary:
 	var start_pos = Vector2i.ZERO

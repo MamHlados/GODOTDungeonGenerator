@@ -9,10 +9,15 @@ var player_node: CharacterBody2D = null
 var is_awake: bool = false
 var is_knocked_back: bool = false
 var knockback_strength: float = 350.0
+var knockback_friction: float = 4.0
 
 func _ready():
 	current_health = max_health
-
+func _physics_process(delta):
+	if is_knocked_back:
+		velocity = velocity.move_toward(Vector2.ZERO, knockback_strength * knockback_friction * delta)
+		
+	move_and_slide()
 func wake_up(player: CharacterBody2D):
 	print("Vstup do místnosti")
 	player_node = player

@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://ds7jdlwsdrvvt"]
+[gd_scene load_steps=15 format=3 uid="uid://ds7jdlwsdrvvt"]
 
 [ext_resource type="Script" path="res://Scripts/frog.gd" id="1_jlxdn"]
 [ext_resource type="Texture2D" uid="uid://cmbh8l0nfpvci" path="res://Assets/Frog.png" id="1_l4tbk"]
@@ -72,6 +72,9 @@ animations = [{
 "speed": 5.0
 }]
 
+[sub_resource type="CircleShape2D" id="CircleShape2D_riovt"]
+radius = 123.037
+
 [node name="Frog" type="CharacterBody2D"]
 collision_layer = 4
 collision_mask = 15
@@ -91,3 +94,12 @@ sprite_frames = SubResource("SpriteFrames_q0cr0")
 position = Vector2(0, -16)
 texture = ExtResource("3_aikdm")
 vframes = 8
+
+[node name="AttackRange" type="Area2D" parent="."]
+collision_layer = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AttackRange"]
+position = Vector2(1, -7)
+shape = SubResource("CircleShape2D_riovt")
+
+[connection signal="body_entered" from="AttackRange" to="." method="_on_attack_range_body_entered"]

@@ -15,11 +15,10 @@ var dash_direction: Vector2 = Vector2.ZERO
 @onready var sprite = $Sprite2D
 func _physics_process(delta):
 	if is_knocked_back:
-		velocity = velocity.move_toward(Vector2.ZERO, dash_speed * 4 * delta)
 		current_state = EyeState.REST
 		state_timer = rest_time
 		sprite.modulate = Color.WHITE
-		move_and_slide()
+		super._physics_process(delta)
 		return
 		
 	if not is_awake or not is_chasing_player or player_node == null:
@@ -49,7 +48,7 @@ func _physics_process(delta):
 			if state_timer <= 0:
 				current_state = EyeState.REST
 				state_timer = rest_time
-	move_and_slide()
+	super._physics_process(delta)
 
 
 func _on_detection_zone_body_entered(body):
