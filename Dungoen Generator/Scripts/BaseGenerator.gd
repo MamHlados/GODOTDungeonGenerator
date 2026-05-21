@@ -116,7 +116,7 @@ func _get_main_direction() -> Vector2i:
 		2: return Vector2i.DOWN
 		3: return Vector2i.LEFT
 		4: return Vector2i.RIGHT
-		_, 0: return [Vector2i.UP, Vector2i.DOWN, Vector2i.LEFT, Vector2i.RIGHT].pick_random()
+		_, 0, 5: return [Vector2i.UP, Vector2i.DOWN, Vector2i.LEFT, Vector2i.RIGHT].pick_random()
 		
 func _get_biased_direction() -> Vector2i:
 	var roll = randf()
@@ -137,7 +137,7 @@ func _get_biased_direction() -> Vector2i:
 			if roll < 0.6: return Vector2i.RIGHT
 			elif roll < 0.8: return Vector2i.UP
 			else: return Vector2i.DOWN
-		_, 0: #BASIC
+		_, 0, 5: #BASIC and TREE
 			return [Vector2i.UP, Vector2i.DOWN, Vector2i.LEFT, Vector2i.RIGHT].pick_random()
 
 			
@@ -151,6 +151,8 @@ func generate_dungeon() -> void:
 	#PRESET - TOWER NEBO CAVE
 	elif current_preset == 1 or current_preset == 2:
 		world_size = Vector2i(needed_size / 2, needed_size * 1.2)
+	elif current_preset == 5:
+		world_size = Vector2i(needed_size * 1.5 , needed_size * 1.5)
 	else:
 		world_size = Vector2i(needed_size, needed_size)
 	# 1. Setup Grid
@@ -221,7 +223,7 @@ func _assign_room_types_and_gameplay() -> void:
 	available_spots.sort_custom(func(a,b):
 		return distances.get(a,0) < distances.get (b,0)
 	)
-	var mid_point = available_spots.size() /2
+	var mid_point = available_spots.size() / 2
 	var early_spots = available_spots.slice(0 , mid_point)
 	var late_spots = available_spots.slice(mid_point, available_spots.size())
 	

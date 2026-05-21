@@ -18,6 +18,7 @@ func _ready():
 	preset_option.add_item("Cave (DOWN)", 2)
 	preset_option.add_item("Side (LEFT)", 3)
 	preset_option.add_item("Side (RIGHT)", 4)
+	preset_option.add_item("Tree", 5)
 	
 	preset_option.select(0)
 	

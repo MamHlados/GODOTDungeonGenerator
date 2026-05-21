@@ -40,24 +40,29 @@ func _create_layout() -> void:
 	_set_room_data(forced_neighbor, {"grid_pos": forced_neighbor, "type": RoomType.NORMAL})
 	taken_positions.append(forced_neighbor)
 	
-	room_centers.append(forced_neighbor)
-	
 	for p in partitions:
 		var center = p.get_center()
 		if abs(center.x) < world_size.x and abs(center.y) < world_size.y:
 			if center != start_pos and center != forced_neighbor:
 				room_centers.append(center)
-			
-	room_centers.sort_custom(func(a,b):
-		var dist_a = abs(a.x - forced_neighbor.x) + abs(a.y - forced_neighbor.y)
-		var dist_b = abs(b.x - forced_neighbor.x) + abs(b.y - forced_neighbor.y)
-		return dist_a < dist_b
+	if current_preset == 5:
+		room_centers.shuffle()
+	else:
+		room_centers.sort_custom(func(a,b):
+			var dist_a = abs(a.x - forced_neighbor.x) + abs(a.y - forced_neighbor.y)
+			var dist_b = abs(b.x - forced_neighbor.x) + abs(b.y - forced_neighbor.y)
+			return dist_a < dist_b
 	)
 	
-	for i in range(room_centers.size() - 1):
+	for i in range(room_centers.size() ):
 		if taken_positions.size() >= number_of_rooms:
 			break
-		_create_corridor(room_centers[i], room_centers[i+1])
+		if current_preset == 5:
+			var target = _find_closest_taken_pos(room_centers[i])
+			_create_corridor(room_centers[i], target)
+		else:
+			if i < room_centers.size() - 1:
+				_create_corridor(room_centers[i], room_centers[i+1])
 		
 	var fallback_loops = 0
 	while taken_positions.size() < number_of_rooms and fallback_loops < 2000:
@@ -104,6 +109,9 @@ func _split_space(rect: Rect2i, current_depth: int) -> Array[Rect2i]:
 	return result
 	
 func _create_corridor(start: Vector2i, end: Vector2i) -> void:
+	if _get_room_data(start) == null:
+		_set_room_data(start, {"grid_pos": start, "type": RoomType.NORMAL})
+		taken_positions.append(start)
 	var current = start
 	while current != end:
 		if taken_positions.size() >= number_of_rooms:
@@ -121,6 +129,9 @@ func _create_corridor(start: Vector2i, end: Vector2i) -> void:
 			continue 
 			
 		current = next_step
+		
+		if current_preset == 5 and _get_room_data(current) != null:
+			return
 		if _get_room_data(current) == null:
 			_set_room_data(current, {"grid_pos": current, "type": RoomType.NORMAL})
 			taken_positions.append(current)
@@ -135,3 +146,12 @@ func _should_split_horizontally() -> bool:
 		_, 0: #BASIC
 			return roll < 0.5
 		
+func _find_closest_taken_pos(pos: Vector2i) -> Vector2i:
+	var closest = taken_positions[0]
+	var min_dist = 1000
+	for taken in taken_positions:
+		var d = abs(pos.x - taken.x) +abs(pos.y - taken.y)
+		if d < min_dist:
+			min_dist = d
+			closest = taken
+	return closest
