@@ -433,6 +433,10 @@ func _on_player_transition	(current_pos: Vector2i, direction: Vector2i, player: 
 	
 	#Does the room exist?
 	if neighbor_data != null and neighbor_data.has("instance"):
+		if neighbor_data["type"] == RoomType.BOSS and not GameManager.has_key:
+			print("LOCKED, YOU NEED A KEY!!!")
+			player.global_position -= Vector2(direction) * 30
+			return
 		var next_room_node = neighbor_data["instance"]
 		
 		var arrival_pos = next_room_node.get_arrival_marker(direction)

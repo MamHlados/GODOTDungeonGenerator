@@ -1,0 +1,18 @@
+[gd_scene load_steps=4 format=3 uid="uid://csqygl5jdlpch"]
+
+[ext_resource type="Texture2D" uid="uid://cbq7xfrs7l3tw" path="res://Assets/HeartDrop.png" id="1_1mpln"]
+[ext_resource type="Script" path="res://Scripts/heart_drop.gd" id="1_roxh8"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_sorkk"]
+radius = 8.0
+
+[node name="HeartDrop" type="Area2D"]
+script = ExtResource("1_roxh8")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_sorkk")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_1mpln")
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]

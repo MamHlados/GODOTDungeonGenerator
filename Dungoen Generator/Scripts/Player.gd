@@ -141,14 +141,16 @@ func take_damage(amount: int, attacker_pos: Vector2):
 	if is_invulnarable:
 		return
 	
-	current_health -= amount
+	GameManager.update_health(-amount)
 	print("Ahhh got hit!!! xdd")
 	
 	is_knocked_back = true
 	var knockback_dir = attacker_pos.direction_to(global_position)
 	velocity = knockback_dir * knockback_strength
-	if current_health <= 0:
+	if GameManager.current_health <= 0:
 		print("You died!")
+		get_tree().change_scene_to_file("res://menu.tscn")
+		return
 	else:
 		is_invulnarable = true
 		await get_tree().create_timer(0.2).timeout

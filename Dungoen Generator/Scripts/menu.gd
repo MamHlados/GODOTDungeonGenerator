@@ -37,6 +37,8 @@ func _ready():
 func _on_generate_pressed():
 	print("Startuji GENERATOR")
 	
+	GameManager.reset_game()
+	
 	var chosen_algo = "RandomWalk"
 	if bsp_button.button_pressed:
 		chosen_algo = "BSP"

@@ -1,6 +1,8 @@
 extends CharacterBody2D
 class_name BaseEnemy	
 
+var coin_scene = preload("res://coin.tscn")
+var heart_scene = preload("res://heart_drop.tscn")
 @export var max_health: int = 10
 @export var speed: int = 40
 
@@ -40,4 +42,14 @@ func take_damage(amount: int, attacker_pos: Vector2):
 		die()
 		
 func die():
+	var drop_amount = randi_range(1,3)
+	for i in range(drop_amount):
+		var coin = coin_scene.instantiate()
+		coin.global_position = global_position + Vector2(randf_range(-10, 10), randf_range(-10, 10))
+		get_tree().current_scene.call_deferred("add_child", coin)
+		
+	if randf() <= 0.10:
+		var heart = heart_scene.instantiate()
+		heart.global_position = global_position + Vector2(randf_range(-10, 10), randf_range(-10, 10))
+		get_tree().current_scene.call_deferred("add_child", heart)
 	queue_free()

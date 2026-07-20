@@ -1,0 +1,44 @@
+[gd_scene load_steps=4 format=3 uid="uid://cy6vs1ullatw8"]
+
+[ext_resource type="Script" path="res://Scripts/in_game_ui.gd" id="1_3pnu8"]
+[ext_resource type="Texture2D" uid="uid://baeu41y1dtpb7" path="res://Assets/UI/Key.png" id="2_klb7a"]
+[ext_resource type="Texture2D" uid="uid://ddo3ulbn6s4ul" path="res://Assets/UI/CoinIcon.png" id="2_toenm"]
+
+[node name="InGameUI" type="CanvasLayer"]
+script = ExtResource("1_3pnu8")
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="Control"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Control/MarginContainer"]
+layout_mode = 2
+
+[node name="HearthContainer" type="HBoxContainer" parent="Control/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="CoinContainer" type="HBoxContainer" parent="Control/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="CoinIcon" type="TextureRect" parent="Control/MarginContainer/VBoxContainer/CoinContainer"]
+layout_mode = 2
+texture = ExtResource("2_toenm")
+stretch_mode = 5
+
+[node name="CoinValue" type="Label" parent="Control/MarginContainer/VBoxContainer/CoinContainer"]
+layout_mode = 2
+
+[node name="Key" type="TextureRect" parent="Control/MarginContainer/VBoxContainer"]
+layout_mode = 2
+texture = ExtResource("2_klb7a")
+stretch_mode = 2

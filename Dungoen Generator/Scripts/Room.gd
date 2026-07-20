@@ -2,12 +2,14 @@ extends Node2D
 
 @onready var spawn_points_enemy_container = $EnemySpawns
 @onready var spawn_points_chest_container = $ChestSpawns
+@onready var spawn_points_key_container = $KeySpawns
 
 const ENEMY_SCENE: Array[PackedScene] = [
 	preload("res://flying_eye.tscn"),
 	preload("res://frog.tscn")
 ]
 const CHEST_SCENE = preload("res://chest.tscn")
+const KEY_SCENE = preload("res://key.tscn")
 
 enum RoomType { NORMAL, START, BOSS, LOOT, SHOP, ENEMY, BUFF, KEY, EMPTY }
 
@@ -48,6 +50,9 @@ func setup_room(room_data: Dictionary, map_pos: Vector2i):
 		
 	if room_data["type"] == RoomType.LOOT:
 		spawn_chest()
+	
+	if room_data["type"] == RoomType.KEY:
+		spawn_key()
 		
 func _on_door_entered(body, direction: Vector2i):
 	if body.name == "Player":
@@ -136,3 +141,20 @@ func deactivate_room():
 	for child in get_children():
 		if child.has_method("sleep"):
 			child.sleep()
+			
+func spawn_key():
+	if spawn_points_key_container:
+		var available_points = spawn_points_key_container.get_children()
+		if available_points.size() == 0:
+			print("Error: KeySpawns container is empty!")
+			return
+		available_points.shuffle()
+		var point = available_points.pop_front()
+		var key = KEY_SCENE.instantiate()
+	
+		key.position = point.position
+		add_child(key)
+	else:
+		print("Error: MISSING KEY IN LOOT ROOM")
+		
+	
