@@ -5,6 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://ddo3ulbn6s4ul" path="res://Assets/UI/CoinIcon.png" id="2_toenm"]
 
 [node name="InGameUI" type="CanvasLayer"]
+process_mode = 3
 script = ExtResource("1_3pnu8")
 
 [node name="Control" type="Control" parent="."]
@@ -42,3 +43,70 @@ layout_mode = 2
 layout_mode = 2
 texture = ExtResource("2_klb7a")
 stretch_mode = 2
+
+[node name="CardPopup" type="PanelContainer" parent="Control"]
+modulate = Color(1, 1, 1, 0)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Control/CardPopup"]
+layout_mode = 2
+
+[node name="PopupIcon" type="TextureRect" parent="Control/CardPopup/VBoxContainer"]
+layout_mode = 2
+stretch_mode = 5
+
+[node name="PopupText" type="Label" parent="Control/CardPopup/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 6
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PauseOverlay" type="ColorRect" parent="Control"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.176471, 0.176471, 0.176471, 0.635294)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Control/PauseOverlay"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 15
+
+[node name="Label" type="Label" parent="Control/PauseOverlay/VBoxContainer"]
+layout_mode = 2
+text = "PAUSE"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ResumeButton" type="Button" parent="Control/PauseOverlay/VBoxContainer"]
+layout_mode = 2
+text = "Continue"
+
+[node name="QuitButton" type="Button" parent="Control/PauseOverlay/VBoxContainer"]
+layout_mode = 2
+text = "Leave game"

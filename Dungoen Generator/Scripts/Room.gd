@@ -10,8 +10,11 @@ const ENEMY_SCENE: Array[PackedScene] = [
 ]
 const CHEST_SCENE = preload("res://chest.tscn")
 const KEY_SCENE = preload("res://key.tscn")
+const CARD_SCENE = preload("res://card_upgrade.tscn")
+const SHOP_SCENE = preload("res://shop_stall.tscn")
+const AMBUSH_SCENE = preload("res://trap_trigger.tscn")
 
-enum RoomType { NORMAL, START, BOSS, LOOT, SHOP, ENEMY, BUFF, KEY, EMPTY }
+enum RoomType { NORMAL, START, BOSS, LOOT, SHOP, ENEMY, BUFF, KEY, EMPTY, TRAP }
 
 signal player_entered_door(current_room_pos: Vector2i, direction: Vector2i, player_node: CharacterBody2D)
 var grid_pos: Vector2i
@@ -53,7 +56,14 @@ func setup_room(room_data: Dictionary, map_pos: Vector2i):
 	
 	if room_data["type"] == RoomType.KEY:
 		spawn_key()
+	
+	if room_data["type"] == RoomType.BUFF:
+		spawn_card()
 		
+	if room_data["type"] == RoomType.SHOP:
+		spawn_shop()
+	if room_data["type"] == RoomType.TRAP:
+		spawn_trap()
 func _on_door_entered(body, direction: Vector2i):
 	if body.name == "Player":
 		player_entered_door.emit(grid_pos, direction, body)
@@ -157,4 +167,44 @@ func spawn_key():
 	else:
 		print("Error: MISSING KEY IN LOOT ROOM")
 		
+func spawn_card():
+	if spawn_points_chest_container:
+		var available_points = spawn_points_key_container.get_children()
+		if available_points.size() == 0:
+			print("Error: KeySpawns container is empty!")
+			return
+		available_points.shuffle()
+		var point = available_points.pop_front()
+		var card = CARD_SCENE.instantiate()
+		var all_colors = ["red","yellow","purple", "green", "cyan", "blue", "orange", "pink"]
+		card.card_color = all_colors.pick_random()
+		card.global_position = global_position
+		get_tree().current_scene.call_deferred("add_child", card)
+	else:
+		print("Erorr: MISSING CARD IN BUFF ROOM")
+func spawn_shop():
+	if spawn_points_chest_container:
+		var available_points = spawn_points_key_container.get_children()
+		if available_points.size() == 0:
+			print("Error: ShopSpawn container is empty!")
+			return
+		available_points.shuffle()
+		var point = available_points.pop_front()
+		var shop = SHOP_SCENE.instantiate()
+		shop.global_position = global_position
+		get_tree().current_scene.call_deferred("add_child", shop)
+	else:
+		print("Erorr: MISSING SHOP IN SHOP ROOM")
+		
+func spawn_trap():
+	var ambush = AMBUSH_SCENE.instantiate()
+	var possible_rewards = ["chest", "card", "none"]
+	ambush.reward_type = possible_rewards.pick_random()
 	
+	if spawn_points_chest_container and spawn_points_chest_container.get_child_count() > 0:
+		var point = spawn_points_chest_container.get_child(0)
+		ambush.position = point.position
+	else:
+		ambush.global_position = global_position
+		
+	add_child(ambush)

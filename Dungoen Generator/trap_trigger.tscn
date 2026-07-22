@@ -1,0 +1,29 @@
+[gd_scene load_steps=3 format=3 uid="uid://cuywl2pnh13ie"]
+
+[ext_resource type="Script" path="res://Scripts/TrapTrigger.gd" id="1_hx6gr"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_6f4ls"]
+size = Vector2(111, 132)
+
+[node name="TrapTrigger" type="Area2D"]
+collision_layer = 0
+script = ExtResource("1_hx6gr")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(-2.5, 0)
+shape = SubResource("RectangleShape2D_6f4ls")
+
+[node name="SpawnPoints" type="Node2D" parent="."]
+position = Vector2(-321, -199)
+
+[node name="Marker2D" type="Marker2D" parent="SpawnPoints"]
+position = Vector2(378, 127)
+
+[node name="Marker2D2" type="Marker2D" parent="SpawnPoints"]
+position = Vector2(259, 126)
+
+[node name="Marker2D3" type="Marker2D" parent="SpawnPoints"]
+position = Vector2(258, 276)
+
+[node name="Marker2D4" type="Marker2D" parent="SpawnPoints"]
+position = Vector2(382, 276)

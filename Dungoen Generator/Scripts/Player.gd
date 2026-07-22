@@ -41,7 +41,7 @@ func _physics_process(delta):
 	character_direction = character_direction.normalized()
 	
 	if character_direction:
-		velocity = character_direction * movement_speed
+		velocity = character_direction * (movement_speed+GameManager.move_speed_bonus)
 		
 		# Figure out which way we are looking based on movement
 		if character_direction.x > 0:
@@ -155,13 +155,13 @@ func take_damage(amount: int, attacker_pos: Vector2):
 		is_invulnarable = true
 		await get_tree().create_timer(0.2).timeout
 		is_knocked_back = false
-		await get_tree().create_timer(1.0).timeout
+		await get_tree().create_timer(1.0 + GameManager.invimcibility_bonus).timeout
 		is_invulnarable = false
 
 
 func _on_sword_hit_box_body_entered(body):
 	if body.has_method("take_damage"):
-		body.take_damage(4, global_position)
+		body.take_damage(GameManager.player_dmg, global_position)
 
 
 func _on_hurt_box_area_entered(area):

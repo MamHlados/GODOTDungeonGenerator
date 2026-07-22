@@ -1,0 +1,65 @@
+[gd_scene load_steps=9 format=3 uid="uid://d0soslehqlab3"]
+
+[ext_resource type="Texture2D" uid="uid://djo4l43nrwsgf" path="res://Assets/Environment/ShopStall.png" id="1_2ht3m"]
+[ext_resource type="Script" path="res://Scripts/shop_stall.gd" id="1_jt3mb"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_x5gus"]
+radius = 26.017
+height = 82.0748
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_27lq1"]
+size = Vector2(91, 73)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_nc50n"]
+atlas = ExtResource("1_2ht3m")
+region = Rect2(0, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_or8bw"]
+atlas = ExtResource("1_2ht3m")
+region = Rect2(128, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1o3kc"]
+atlas = ExtResource("1_2ht3m")
+region = Rect2(256, 0, 128, 128)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_j3oig"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_nc50n")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_or8bw")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1o3kc")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 3.0
+}]
+
+[node name="ShopStall" type="StaticBody2D"]
+collision_layer = 4
+collision_mask = 4
+script = ExtResource("1_jt3mb")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(1, -7)
+rotation = -1.54557
+shape = SubResource("CapsuleShape2D_x5gus")
+
+[node name="HurtBox" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 4
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HurtBox"]
+position = Vector2(2.5, -11.5)
+shape = SubResource("RectangleShape2D_27lq1")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_j3oig")
+animation = &"idle"
+autoplay = "idle"
+frame = 1
+frame_progress = 0.99185
