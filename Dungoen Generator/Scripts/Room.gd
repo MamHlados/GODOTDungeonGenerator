@@ -178,8 +178,8 @@ func spawn_card():
 		var card = CARD_SCENE.instantiate()
 		var all_colors = ["red","yellow","purple", "green", "cyan", "blue", "orange", "pink"]
 		card.card_color = all_colors.pick_random()
-		card.global_position = global_position
-		get_tree().current_scene.call_deferred("add_child", card)
+		card.position = point.position
+		call_deferred("add_child", card)
 	else:
 		print("Erorr: MISSING CARD IN BUFF ROOM")
 func spawn_shop():
@@ -191,8 +191,8 @@ func spawn_shop():
 		available_points.shuffle()
 		var point = available_points.pop_front()
 		var shop = SHOP_SCENE.instantiate()
-		shop.global_position = global_position
-		get_tree().current_scene.call_deferred("add_child", shop)
+		shop.position = point.position
+		call_deferred("add_child", shop)
 	else:
 		print("Erorr: MISSING SHOP IN SHOP ROOM")
 		

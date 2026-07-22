@@ -1,0 +1,29 @@
+[gd_scene load_steps=4 format=3 uid="uid://v0f1b0bcmipt"]
+
+[ext_resource type="Script" path="res://Scripts/Signpost.gd" id="1_45owr"]
+[ext_resource type="Texture2D" uid="uid://wnvnu3tgg1j0" path="res://Assets/Environment/Signpost.png" id="2_d0o78"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_cweap"]
+radius = 11.0
+
+[node name="Signpost" type="StaticBody2D"]
+collision_layer = 4
+collision_mask = 4
+script = ExtResource("1_45owr")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_d0o78")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -3)
+shape = SubResource("CapsuleShape2D_cweap")
+
+[node name="HintLabel" type="Label" parent="."]
+modulate = Color(1, 1, 1, 0)
+offset_left = -132.0
+offset_top = -61.0
+offset_right = 131.0
+offset_bottom = 38.0
+theme_override_font_sizes/font_size = 12
+horizontal_alignment = 1
+autowrap_mode = 2

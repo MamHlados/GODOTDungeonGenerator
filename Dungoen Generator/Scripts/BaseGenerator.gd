@@ -3,6 +3,9 @@ class_name BaseGenerator
 
 signal generation_complete
 
+signal level_hint_generated(hint_text: String)
+var current_key_pos: Vector2i = Vector2i.ZERO
+
 @export_group("Settings")
 #Grid
 @export var world_size: Vector2i = Vector2i(6, 6) 
@@ -17,6 +20,8 @@ var bg_rect: ColorRect
 var current_preset: int = 0
 var difficulty: int = 2
 var animate_generation: bool = false
+
+const SIGNPOST_SCENE = preload("res://signpost.tscn")
 
 const ROOM_SCENES = {
 	1:[ preload("res://ScenesRooms/From_master_roomV2/V2U.tscn"),
@@ -173,6 +178,22 @@ func generate_dungeon() -> void:
 	# 6. Draw decorations
 	_decorate_void()
 	
+	var hint = _generate_compass_hint(current_key_pos)
+	
+	var start_room_data = _get_room_data(Vector2i.ZERO)
+	
+	if start_room_data != null and start_room_data.has("instance"):
+		var start_room_instance = start_room_data["instance"]
+		
+		var signpost = SIGNPOST_SCENE.instantiate()
+		signpost.hint_text = hint
+		
+		signpost.position = Vector2(0, -40) 
+		
+		signpost.add_to_group("dungeon_cleanup")
+		
+		start_room_instance.add_child(signpost)
+	
 	generation_complete.emit()
 
 func _initialize_grid() -> void:
@@ -210,6 +231,7 @@ func _assign_room_types_and_gameplay() -> void:
 	# 3. Find Key Room (Far from Boss)
 	var key_pos = _find_key_position(boss_pos, distances)
 	_get_room_data(key_pos)["type"] = RoomType.KEY
+	current_key_pos = key_pos
 	
 	# 4. Available spots
 	var available_spots = []
@@ -485,3 +507,20 @@ func _decorate_void() -> void:
 		var random_flower = flower_tiles.pick_random()
 		void_tilemap.set_cell(decoration_layer, tile_pos, source_id, random_flower)
 		
+func _generate_compass_hint(target_pos: Vector2i) -> String:
+	var dir_str = ""
+	
+	if target_pos.y < 0:
+		dir_str += "North"
+	elif target_pos.y > 0:
+		dir_str += "South"
+		
+	if target_pos.x < 0:
+		if dir_str == "": dir_str = "West"
+		else: dir_str += "west"
+	elif target_pos.x > 0:
+		if dir_str == "": dir_str = "East"
+		else: dir_str += "east"
+
+		
+	return "First you have to find key to the boss room!\nIt should be somewhere " + dir_str + "."

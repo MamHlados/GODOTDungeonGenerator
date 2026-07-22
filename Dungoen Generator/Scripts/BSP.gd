@@ -53,13 +53,15 @@ func _create_layout() -> void:
 			var dist_b = abs(b.x - forced_neighbor.x) + abs(b.y - forced_neighbor.y)
 			return dist_a < dist_b
 	)
-	
+	if current_preset != 5 and room_centers.size() > 0:
+		_create_corridor(forced_neighbor, room_centers[0])
+		
 	for i in range(room_centers.size() ):
 		if taken_positions.size() >= number_of_rooms:
 			break
 		if current_preset == 5:
 			var target = _find_closest_taken_pos(room_centers[i])
-			_create_corridor(room_centers[i], target)
+			_create_corridor(target, room_centers[i])
 		else:
 			if i < room_centers.size() - 1:
 				_create_corridor(room_centers[i], room_centers[i+1])
@@ -110,6 +112,8 @@ func _split_space(rect: Rect2i, current_depth: int) -> Array[Rect2i]:
 	
 func _create_corridor(start: Vector2i, end: Vector2i) -> void:
 	if _get_room_data(start) == null:
+		if taken_positions.size() >= number_of_rooms:
+			return
 		_set_room_data(start, {"grid_pos": start, "type": RoomType.NORMAL})
 		taken_positions.append(start)
 	var current = start
@@ -133,6 +137,8 @@ func _create_corridor(start: Vector2i, end: Vector2i) -> void:
 		if current_preset == 5 and _get_room_data(current) != null:
 			return
 		if _get_room_data(current) == null:
+			if taken_positions.size() >= number_of_rooms:
+				return
 			_set_room_data(current, {"grid_pos": current, "type": RoomType.NORMAL})
 			taken_positions.append(current)
 
