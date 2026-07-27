@@ -6,6 +6,11 @@ class_name BSP
 @export var depth: int = 4 
 
 func _create_layout() -> void:
+	if number_of_rooms <= 25: depth = 4
+	elif number_of_rooms <= 50: depth = 5
+	elif number_of_rooms <= 100: depth = 6
+	elif number_of_rooms <= 500: depth = 7
+	else: depth = 8
 	var bounds = int(ceil(sqrt(number_of_rooms * 0.8)))
 	if bounds < 2: bounds = 2
 	

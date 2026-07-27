@@ -131,6 +131,7 @@ vertical_alignment = 1
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 min_value = 10.0
+max_value = 1000.0
 value = 20.0
 alignment = 1
 

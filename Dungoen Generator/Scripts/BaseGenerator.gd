@@ -115,6 +115,9 @@ func _input(_event: InputEvent) -> void:
 	if Input.is_action_just_pressed("ui_accept"):
 		generate_dungeon()
 		
+	if Input.is_action_just_pressed("testing"):
+		run_benchmark(100)
+		
 func _get_main_direction() -> Vector2i:
 	match current_preset:
 		1: return Vector2i.UP
@@ -369,11 +372,11 @@ func _find_furthest_dead_end(distances: Dictionary) -> Vector2i:
 	
 	for pos in taken_positions:
 		if pos == Vector2i.ZERO: continue
-		if _count_neighbors(pos) == 1: # Dead end
-			var d = distances.get(pos, 0)
-			if d > max_dist:
-				max_dist = d
-				best_pos = pos
+		
+		var d = distances.get(pos, 0)
+		if d > max_dist:
+			max_dist = d
+			best_pos = pos
 	
 	# Fallback
 	if best_pos == Vector2i.ZERO: best_pos = taken_positions.back()
@@ -524,3 +527,54 @@ func _generate_compass_hint(target_pos: Vector2i) -> String:
 
 		
 	return "First you have to find key to the boss room!\nIt should be somewhere " + dir_str + "."
+	
+func run_benchmark(iterations: int = 100) -> void:
+	print("Starting Benchmark with:  ", iterations, " iterations ")
+	
+	var algo_name = "BSP" if "depth" in self else "RandomWalk"
+	var file_name = "user://benchmark_%s_%d.csv" % [algo_name, number_of_rooms]
+	var file = FileAccess.open(file_name, FileAccess.WRITE)
+	
+	if file == null:
+		print("ERRRORRROR")
+		return
+	
+	file.store_line("Iterace,Pocet_Mistnosti,Cas_mikrosekundy,Vzdalenost_Boss,Hustota")
+	
+	for i in range(iterations):
+		var needed_size = int(sqrt(number_of_rooms)) + 2
+		world_size = Vector2i(needed_size * 1.5, needed_size * 1.5)
+		
+		_initialize_grid()
+		
+		var start_time = Time.get_ticks_usec()
+		_create_layout()
+		var exec_time = Time.get_ticks_usec() - start_time
+		
+		_analyze_connections()
+		_assign_room_types_and_gameplay()
+		
+		var boss_distance = 0
+		for pos in taken_positions:
+			var room_data = _get_room_data(pos)
+			if room_data["type"] == RoomType.BOSS:
+				boss_distance = room_data.get("distance", 0)
+				break
+				
+		var total_neighbors = 0
+		for pos in taken_positions:
+			total_neighbors += _count_neighbors(pos)
+			
+		var density = 0.0
+		var actual_rooms = taken_positions.size()
+		
+		if actual_rooms > 0:
+			density = float(total_neighbors) / float(actual_rooms)
+			
+		var line = "%d,%d,%d,%d,%.2f" % [i + 1, actual_rooms, exec_time, boss_distance, density]
+		file.store_line(line)
+		
+	file.close()
+	
+	var absolute_path = ProjectSettings.globalize_path("user://benchmark_results.csv")
+	print("Benchmark finished, here is a path: ", absolute_path)
