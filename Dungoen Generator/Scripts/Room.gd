@@ -142,15 +142,23 @@ func spawn_chest():
 	else:
 		print("Error: MISSING CHEST IN LOOT ROOM")
 		
-func activate_room(player: CharacterBody2D):
-	for child in get_children():
-		if child.has_method("wake_up"):
-			child.wake_up(player)
-			
 func deactivate_room():
 	for child in get_children():
-		if child.has_method("sleep"):
+		if child is BaseEnemy:
 			child.sleep()
+		elif child.has_node("EnemySpawns"):
+			for enemy in child.get_node("EnemySpawns").get_children():
+				if enemy is BaseEnemy:
+					enemy.sleep()
+
+func activate_room(player: CharacterBody2D):
+	for child in get_children():
+		if child is BaseEnemy:
+			child.wake_up(player)
+		elif child.has_node("EnemySpawns"):
+			for enemy in child.get_node("EnemySpawns").get_children():
+				if enemy is BaseEnemy:
+					enemy.wake_up(player)
 			
 func spawn_key():
 	if spawn_points_key_container:
@@ -198,13 +206,9 @@ func spawn_shop():
 		
 func spawn_trap():
 	var ambush = AMBUSH_SCENE.instantiate()
-	var possible_rewards = ["chest", "card", "none"]
-	ambush.reward_type = possible_rewards.pick_random()
+	ambush.reward_type = ["chest", "card", "none"].pick_random()
+	
+	add_child(ambush)
 	
 	if spawn_points_chest_container and spawn_points_chest_container.get_child_count() > 0:
-		var point = spawn_points_chest_container.get_child(0)
-		ambush.position = point.position
-	else:
-		ambush.global_position = global_position
-		
-	add_child(ambush)
+		ambush.position = spawn_points_chest_container.get_child(0).position

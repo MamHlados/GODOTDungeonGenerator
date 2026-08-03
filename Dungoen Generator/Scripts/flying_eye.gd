@@ -60,6 +60,12 @@ func _on_detection_zone_body_entered(body):
 			state_timer = charge_time
 			sprite.modulate = Color.RED
 	
+func sleep():
+	super.sleep()
+	is_chasing_player = false
+	current_state = EyeState.REST
+	sprite.modulate = Color.WHITE
+	
 #func _on_detection_zone_body_exited(body):
 #	if body.name == "Player":
 #		is_chasing_player = false

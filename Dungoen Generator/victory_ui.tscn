@@ -1,0 +1,86 @@
+[gd_scene load_steps=2 format=3 uid="uid://dqv3yvnok2lmj"]
+
+[ext_resource type="Script" path="res://Scripts/victory_ui.gd" id="1_hab5i"]
+
+[node name="VictoryUI" type="CanvasLayer"]
+process_mode = 3
+script = ExtResource("1_hab5i")
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+
+[node name="ColorRect" type="ColorRect" parent="Control"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.345098, 0.345098, 0.345098, 0.643137)
+
+[node name="Panel" type="Panel" parent="Control/ColorRect"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Control/ColorRect/Panel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -4.0
+offset_top = -77.5
+offset_right = 4.0
+offset_bottom = 77.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="LabelTitle" type="Label" parent="Control/ColorRect/Panel/VBoxContainer"]
+layout_mode = 2
+text = "DUNGEON COMPLETED"
+
+[node name="LabelTime" type="Label" parent="Control/ColorRect/Panel/VBoxContainer"]
+layout_mode = 2
+text = "Time: "
+
+[node name="LabelKills" type="Label" parent="Control/ColorRect/Panel/VBoxContainer"]
+layout_mode = 2
+text = "Enemies killed: "
+
+[node name="LabelCoins" type="Label" parent="Control/ColorRect/Panel/VBoxContainer"]
+layout_mode = 2
+text = "Coins collected: "
+
+[node name="LabelSeed" type="Label" parent="Control/ColorRect/Panel/VBoxContainer"]
+layout_mode = 2
+text = "Dungeon seed: "
+
+[node name="LabelAlgo" type="Label" parent="Control/ColorRect/Panel/VBoxContainer"]
+layout_mode = 2
+text = "Dungeon seed: "
+
+[node name="LabelRooms" type="Label" parent="Control/ColorRect/Panel/VBoxContainer"]
+layout_mode = 2
+text = "Dungeon seed: "
+
+[node name="HSeparator" type="HSeparator" parent="Control/ColorRect/Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="NextLevelButton" type="Button" parent="Control/ColorRect/Panel/VBoxContainer"]
+layout_mode = 2
+text = "Restart level"
+
+[node name="LeaveButton" type="Button" parent="Control/ColorRect/Panel/VBoxContainer"]
+layout_mode = 2
+text = "Leave"

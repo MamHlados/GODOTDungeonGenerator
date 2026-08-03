@@ -21,6 +21,7 @@ var current_preset: int = 0
 var difficulty: int = 2
 var animate_generation: bool = false
 
+const VICTORY_UI_SCENE = preload("res://victory_ui.tscn")
 const SIGNPOST_SCENE = preload("res://signpost.tscn")
 
 const ROOM_SCENES = {
@@ -89,17 +90,32 @@ enum RoomType { NORMAL, START, BOSS, LOOT, SHOP, ENEMY, BUFF, KEY, EMPTY, TRAP }
 
 var friendly_types = [RoomType.START, RoomType.LOOT, RoomType.SHOP, RoomType.BUFF]
 
+#GENERATOR TESTING
+#const TYPE_COLORS = {
+	#RoomType.NORMAL: Color.WHITE,
+	#RoomType.START: Color.GREEN,
+	#RoomType.BOSS: Color.DARK_RED,
+	#RoomType.LOOT: Color.GOLD,
+	#RoomType.SHOP: Color.BLUE,
+	#RoomType.ENEMY: Color.PURPLE,
+	#RoomType.BUFF: Color.CYAN,
+	#RoomType.KEY: Color.MAGENTA,
+	#RoomType.EMPTY: Color.DIM_GRAY,
+	#RoomType.TRAP: Color.ORANGE
+#}
+
+#GENERATOR TESTING
 const TYPE_COLORS = {
 	RoomType.NORMAL: Color.WHITE,
-	RoomType.START: Color.GREEN,
-	RoomType.BOSS: Color.DARK_RED,
-	RoomType.LOOT: Color.GOLD,
-	RoomType.SHOP: Color.BLUE,
-	RoomType.ENEMY: Color.PURPLE,
-	RoomType.BUFF: Color.CYAN,
-	RoomType.KEY: Color.MAGENTA,
-	RoomType.EMPTY: Color.DIM_GRAY,
-	RoomType.TRAP: Color.ORANGE
+	RoomType.START: Color.WHITE,
+	RoomType.BOSS: Color.WHITE,
+	RoomType.LOOT: Color.WHITE,
+	RoomType.SHOP: Color.WHITE,
+	RoomType.ENEMY: Color.WHITE,
+	RoomType.BUFF: Color.WHITE,
+	RoomType.KEY: Color.WHITE,
+	RoomType.EMPTY: Color.WHITE,
+	RoomType.TRAP: Color.WHITE
 }
 
 var rooms: Array = []        
@@ -451,30 +467,44 @@ func _has_neighbor_of_type(pos: Vector2i, type: RoomType) -> bool:
 				return true
 	return false
 	
-func _on_player_transition	(current_pos: Vector2i, direction: Vector2i, player: CharacterBody2D):
-	#Position of the next door
+func _on_player_transition(current_pos: Vector2i, direction: Vector2i, player: CharacterBody2D):
 	var next_room_pos = current_pos + direction
 	var neighbor_data = _get_room_data(next_room_pos)
 	
-	#Does the room exist?
 	if neighbor_data != null and neighbor_data.has("instance"):
 		if neighbor_data["type"] == RoomType.BOSS and not GameManager.has_key:
 			print("LOCKED, YOU NEED A KEY!!!")
-			player.global_position -= Vector2(direction) * 30
+			
+			var target_pos = player.global_position - Vector2(direction) * 40.0
+			var push_tween = create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+			push_tween.tween_property(player, "global_position", target_pos, 0.25)
+			
+			var color_tween = create_tween()
+			color_tween.tween_property(player, "modulate", Color.RED, 0.1)
+			color_tween.tween_property(player, "modulate", Color.WHITE, 0.15)
+			
+			_show_floating_text(player, "LOCKED! YOU NEED A KEY!")
 			return
-		var next_room_node = neighbor_data["instance"]
-		
-		var arrival_pos = next_room_node.get_arrival_marker(direction)
-		
-		player.global_position = arrival_pos 
-		
+			
 		var current_room_data = _get_room_data(current_pos)
 		if current_room_data != null and current_room_data.has("instance"):
 			if current_room_data["instance"].has_method("deactivate_room"):
 				current_room_data["instance"].deactivate_room()
+				
+		var next_room_node = neighbor_data["instance"]
+		var arrival_pos = next_room_node.get_arrival_marker(direction)
+		player.global_position = arrival_pos 
+		
 		if next_room_node.has_method("activate_room"):
 			next_room_node.activate_room(player)
-		
+			
+		if neighbor_data["type"] == RoomType.BOSS and GameManager.has_key:
+			_trigger_victory_sequence()
+
+func _trigger_victory_sequence() -> void:
+	await get_tree().create_timer(0.5).timeout
+	var victory_ui = VICTORY_UI_SCENE.instantiate()
+	get_tree().current_scene.add_child(victory_ui)
 	
 func _decorate_void() -> void:
 	# VOID
@@ -578,3 +608,19 @@ func run_benchmark(iterations: int = 100) -> void:
 	
 	var absolute_path = ProjectSettings.globalize_path("user://benchmark_results.csv")
 	print("Benchmark finished, here is a path: ", absolute_path)
+	
+func _show_floating_text(target_node: Node2D, text_content: String) -> void:
+	var label = Label.new()
+	label.text = text_content
+	label.modulate = Color.RED
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.position = target_node.global_position + Vector2(-80, -40)
+	
+	get_tree().current_scene.add_child(label)
+	
+	var tween = create_tween().set_parallel(true)
+	tween.tween_property(label, "position:y", label.position.y - 30, 1.2).set_trans(Tween.TRANS_SINE)
+	tween.tween_property(label, "modulate:a", 0.0, 1.2).set_trans(Tween.TRANS_SINE)
+	
+	await tween.finished
+	label.queue_free()

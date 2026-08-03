@@ -71,3 +71,10 @@ func spit_water():
 func _on_attack_range_body_entered(body):
 	if body.name == "Player":
 		is_player_in_range = true
+		
+func sleep():
+	super.sleep()
+	is_player_in_range = false
+	current_state = FrogState.REST
+	sprite_2d.modulate = Color.WHITE
+	

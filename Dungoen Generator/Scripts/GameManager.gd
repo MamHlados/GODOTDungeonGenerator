@@ -11,9 +11,17 @@ var move_speed_bonus: float = 0.0
 var invimcibility_bonus: float = 0.0
 var knockback_bonus: float = 0.0
 
+var time_elapsed: float = 0.0
+var enemies_killed: int = 0
+var total_coins_collected: int = 0
+
+
 signal player_stats_changed
 signal card_collected_popup(card_texture: Texture2D, description: String)
 
+func _process(delta):
+	time_elapsed += delta
+	
 func reset_game() -> void:
 	current_health = max_health
 	coins = 0
@@ -24,15 +32,22 @@ func reset_game() -> void:
 	move_speed_bonus = 0.0
 	knockback_bonus = 0.0
 	invimcibility_bonus = 0.0
+	time_elapsed = 0.0
+	enemies_killed = 0
+	total_coins_collected = 0
 	player_stats_changed.emit()
 	
 func add_coin(amount: int) -> void:
 	coins += amount
+	total_coins_collected += amount
 	player_stats_changed.emit()
 	
 func gain_key() -> void:
 	has_key = true
 	player_stats_changed.emit()
+	
+func add_enemy_kill() -> void:
+	enemies_killed += 1
 	
 func update_health(amount: int) -> void:
 	current_health = clampi(current_health + amount, 0, max_health)

@@ -28,6 +28,8 @@ func wake_up(player: CharacterBody2D):
 
 func sleep():
 	is_awake = false
+	player_node = null
+	velocity = Vector2.ZERO
 	
 func take_damage(amount: int, attacker_pos: Vector2):
 	current_health -= amount
@@ -43,6 +45,8 @@ func take_damage(amount: int, attacker_pos: Vector2):
 		die()
 		
 func die():
+	if "enemies_killed" in GameManager:
+		GameManager.enemies_killed += 1
 	var drop_amount = randi_range(1,GameManager.coin_max_drop)
 	for i in range(drop_amount):
 		var coin = coin_scene.instantiate()

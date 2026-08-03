@@ -7,12 +7,14 @@ var game_started: bool = false
 var overview_camera: Camera2D
 
 func _ready() -> void:
-	if GeneratorSettings.dungeon_seed != "":
-		seed(GeneratorSettings.dungeon_seed.hash())
-		print("Vlastní seed: ", GeneratorSettings.dungeon_seed)
+	if GeneratorSettings.dungeon_seed > 0:
+		seed(GeneratorSettings.dungeon_seed)
+		print("Použit seed: ", GeneratorSettings.dungeon_seed)
 	else:
 		randomize()
-		print("Nahodny seed")
+		GeneratorSettings.dungeon_seed = randi_range(100000, 999999)
+		seed(GeneratorSettings.dungeon_seed)
+		print("Vygenerován nový náhodný seed: ", GeneratorSettings.dungeon_seed)
 	
 	var activate_generator = null
 	if GeneratorSettings.chosen_algorithm == "RandomWalk":
@@ -31,12 +33,12 @@ func _ready() -> void:
 		overview_camera = Camera2D.new()
 		add_child(overview_camera)
 		overview_camera.make_current()
-		overview_camera.zoom = Vector2(0.1,0.1)
+		overview_camera.zoom = Vector2(0.1, 0.1)
 	
 	print("GENERACE MAPY")
 	print("Algoritmus: ", GeneratorSettings.chosen_algorithm)
 	activate_generator.generate_dungeon()
-
+	
 func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):
 		get_tree().change_scene_to_file("res://menu.tscn")
